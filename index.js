@@ -1,9 +1,6 @@
 const { app, BrowserWindow, BrowserView, Menu, Tray, Notification, globalShortcut, shell } = require('electron')
 const path = require('path');
 const Store = require('./store.js');
-window.$ = window.jQuery = require('jquery');
-
-var currentVer = app.getVersion();
 
 //Information About App
 function versionNum(){
@@ -171,10 +168,10 @@ function createWindow () {
   })
 
   mainWindow.loadURL('https://tweetdeck.twitter.com')
-  //mainWindow.loadFile('index.html')
+  //mainWindow.loadFile('src/index.html')
 
   // Open the DevTools.
-  //win.webContents.openDevTools()
+  //mainWindow.webContents.openDevTools()
 
   //Add Menu
   const menu = Menu.buildFromTemplate(menuT)
