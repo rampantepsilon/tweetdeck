@@ -239,7 +239,7 @@ function createWindow () {
 
   const secondNotif = new Notification({
     title: 'TweetDeck',
-    body: 'Did you know? Press Ctrl+Alt+T or CMD+Alt+T to open/minimize TweetDeck.',
+    body: 'Did you know? Press Ctrl+Alt+Shift+T or CMD+Alt+Shift+T to open/minimize TweetDeck.',
     icon: __dirname + '/logo.png'
   })
 
@@ -254,7 +254,7 @@ function createWindow () {
   }
   setInterval(promo, 7200000)
 
-  globalShortcut.register('CommandOrControl+Alt+T', () => {
+  globalShortcut.register('CommandOrControl+Alt+Shift+T', () => {
     if (show == true){
       mainWindow.hide();
       show = false;
