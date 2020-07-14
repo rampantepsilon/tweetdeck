@@ -1,4 +1,5 @@
-const { app, BrowserWindow, BrowserView, Menu, Tray, Notification, globalShortcut, shell } = require('electron')
+const { app, BrowserWindow, BrowserView, Menu, Tray, Notification, globalShortcut, shell, dialog } = require('electron')
+const $ = require('jquery');
 const path = require('path');
 const Store = require('./store.js');
 
@@ -81,6 +82,12 @@ let menuT = [
         role: 'forceReload',
         accelerator: 'CommandOrControl+F5'
       },{
+        label: 'Toggle Dev Tools',
+        role: 'toggledevtools',
+        accelerator: 'CommandOrControl+Alt+I',
+        enabled: true,
+        visible: false
+      },{
         type: 'separator'
       },{
         label: 'Actual Size',
@@ -133,6 +140,13 @@ let menuT = [
         visible: false,
         click(){
 
+        }
+      },{
+        label: 'Check For Updates',
+        enabled: true,
+        visible: false,
+        click(){
+          dialog.showMessageBox(null, dialogOptions, (response, checkboxChecked) => {});
         }
       }
     ]
@@ -208,6 +222,11 @@ function createWindow () {
 
   mainWindow.on('show',function(event){
     clearInterval(not2);
+  })
+
+  mainWindow.webContents.on('new-window', (event, url) => {
+    event.preventDefault();
+    shell.openExternal(url);
   })
 
   tray = new Tray(__dirname + '/logo.png');
@@ -294,3 +313,39 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+var currentVer = app.getVersion();
+
+var dialogOptions
+
+/*app.on('ready', function(){
+  var request = http.get('https://api.github.com/repos/rampantepsilon/tweetdeck/releases', function(result){
+    console.log(result);
+    var commit = result[0].tag_name;
+    var updateStatus;
+
+    for (i=0; i < result.length;i++){
+      if (result[i].tag_name != currentVer && result[i].tag_name > currentVer && result[i].tag_name.indexOf('alpha') == -1 && result[i].tag_name.indexOf('beta') == -1){
+        updateStatus = "New Version (v" + result[i].tag_name + ") available! <a href='https://github.com/rampantepsilon/tweetdeck/releases/' target='_blank'>Click Here to Download</a>";
+      }
+    }
+    if (updateStatus == "") {
+      updateStatus = "No Release Updates Available.";
+    }
+
+    dialogOptions = {
+      type: 'info',
+      buttons: [{
+        label: 'Update',
+        click: () => {
+          window.open('https://github.com/rampantepsilon/tweetdeck/releases');
+        }
+      },{
+        label: 'Close'
+      }],
+      title: 'Check For Updates',
+      message: 'No Updates',
+      detail: ''
+    }
+  })
+})*/
