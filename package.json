@@ -1,0 +1,21 @@
+{
+  "name": "tweetdeck",
+  "version": "1.0.0",
+  "description": "TweetDeck is back on the Desktop in it's own Electron-based App",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "electron .",
+    "package-mac": "electron-packager ./ --overwrite --platform=darwin --asar --arch=x64 --icon=logo.png --out=build",
+    "package-win64": "electron-packager ./ tweetdeck --overwrite --asar --platform=win32 --arch=x64 --icon=logo.ico --out=build --version-string.CompanyName=RampantEpsilon --version-string.ProductName=\"TweetDeck Standalone Client\"",
+    "package-win32": "electron-packager ./ tweetdeck --overwrite --asar --platform=win32 --arch=ia32 --icon=logo.ico --out=build --version-string.CompanyName=RampantEpsilon --version-string.ProductName=\"TweetDeck Standalone Client\"",
+    "package-linux": "electron-packager ./ tweetdeck --platform=linux --arch=x64 --overwrite --asar  --icon=logo.png --out=build"
+  },
+  "author": "Tom \"RampantEpsilon\" Ware",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^9.1.0",
+    "xhr2": "*"
+  }
+}
