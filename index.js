@@ -13,8 +13,8 @@ const changelogOptions = {
   type: 'info',
   buttons: ['Close'],
   title: 'Changelog',
-  message: 'Changes in v2.0.0',
-  detail: '- Changed Global Hotkeys for application due to conflict with Linux users. (Ctrl+Alt+T opens the Terminal in most distros.)\n- Changed the Hotkey Notification to no longer show when the window is in focus.\n- Changed link handling so that all links opened in TweetDeck now open in your default browser\n- Added an updater to the application. You will receive a notification within 8 hours after a new release. If you want to update sooner, there is a Check for Updates button under About. Once an update is found through either method, the Download Update button will be available to take you to the new update.'
+  message: 'Changes in v2.0.1',
+  detail: 'HOTFIX: Fixed issue where the updater notification box would show when automatically checking for updates\n\n Changes in v2.0.0\n- Changed Global Hotkeys for application due to conflict with Linux users. (Ctrl+Alt+T opens the Terminal in most distros.)\n- Changed the Hotkey Notification to no longer show when the window is in focus.\n- Changed link handling so that all links opened in TweetDeck now open in your default browser\n- Added an updater to the application. You will receive a notification within 8 hours after a new release. If you want to update sooner, there is a Check for Updates button under About. Once an update is found through either method, the Download Update button will be available to take you to the new update.'
 }
 
 //Information About App
@@ -40,6 +40,7 @@ let mainWindow;
 var not2;
 var currentVer = app.getVersion();
 var commit;
+var manualCheck = "false";
 
 const store = new Store({
   configName: 'user-preferences',
@@ -158,7 +159,9 @@ let menuT = [
         }
       },{
         label: 'Check For Updates',
+        id: 'update-check',
         click(){
+          manualCheck = 'true';
           updateCheck();
         }
       },{
@@ -175,6 +178,7 @@ let menuT = [
 
 const menu = Menu.buildFromTemplate(menuT)
 var updateItem = menu.getMenuItemById('dl-update');
+var upd8CheckBtn = menu.getMenuItemById('update-check');
 
 function createWindow () {
   var count = 0;
@@ -316,6 +320,8 @@ function createWindow () {
     }
   })
 
+  updateCheck();
+
   setInterval(updateCheck, 3600000)
 
   function updateNotif(){
@@ -367,6 +373,7 @@ const options3 = {
 }
 
 function updateCheck(){
+  upd8CheckBtn.enabled = false;
   https.get(options, function (res) {
     var json = '';
     res.on('data', function (chunk) {
@@ -393,16 +400,21 @@ function updateCheck(){
 function push(){
   if (commit > currentVer){
     updateItem.enabled = true;
-    dialog.showMessageBox(options2, (index) => {
-      event.sender.send('information-dialog-selection', index)
-    })
+    if (manualCheck == "true"){
+      dialog.showMessageBox(options2, (index) => {
+        event.sender.send('information-dialog-selection', index)
+      })
+    }
     console.log("Done v" + commit + " found.");
   } else {
-    dialog.showMessageBox(options3, (index) => {
-      event.sender.send('information-dialog-selection', index)
-    })
+    if (manualCheck == 'true'){
+      dialog.showMessageBox(options3, (index) => {
+        event.sender.send('information-dialog-selection', index)
+      })
+    }
     console.log("Done");
   }
+  upd8CheckBtn.enabled = true;
 }
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
