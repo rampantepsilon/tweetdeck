@@ -22,6 +22,7 @@ function title(){
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+var not2;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -202,7 +203,11 @@ function createWindow () {
   mainWindow.on('hide', function(event){
     show = false;
     myNotification.show();
-    setInterval(notif2, 1800000)
+    not2 = setInterval(notif2, 1800000)
+  })
+
+  mainWindow.on('show',function(event){
+    clearInterval(not2);
   })
 
   tray = new Tray(__dirname + '/logo.png');
