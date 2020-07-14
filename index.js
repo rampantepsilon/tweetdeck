@@ -2,6 +2,21 @@ const { app, BrowserWindow, BrowserView, Menu, Tray, Notification, globalShortcu
 const $ = require('jquery');
 const path = require('path');
 const Store = require('./store.js');
+var https = require('https');
+
+var options = {
+  host: 'api.github.com',
+  path: '/repos/rampantepsilon/tweetdeck/releases',
+  headers: {'User-Agent': 'request'}
+}
+
+const changelogOptions = {
+  type: 'info',
+  buttons: ['Close'],
+  title: 'Changelog',
+  message: 'Changes in v2.0.0',
+  detail: '- Changed Global Hotkeys for application due to conflict with Linux users. (Ctrl+Alt+T opens the Terminal in most distros.)\n- Changed the Hotkey Notification to no longer show when the window is in focus.\n- Changed link handling so that all links opened in TweetDeck now open in your default browser\n- Added an updater to the application. You will receive a notification within 8 hours after a new release. If you want to update sooner, there is a Check for Updates button under About. Once an update is found through either method, the Download Update button will be available to take you to the new update.'
+}
 
 //Information About App
 function versionNum(){
@@ -22,8 +37,10 @@ function title(){
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-let mainWindow
+let mainWindow;
 var not2;
+var currentVer = app.getVersion();
+var commit;
 
 const store = new Store({
   configName: 'user-preferences',
@@ -137,21 +154,28 @@ let menuT = [
         enabled: false,
       },{
         label: "Changelog",
-        visible: false,
         click(){
-
+          dialog.showMessageBox(null, changelogOptions, (response, checkboxChecked) =>{});
         }
       },{
         label: 'Check For Updates',
-        enabled: true,
-        visible: false,
         click(){
-          dialog.showMessageBox(null, dialogOptions, (response, checkboxChecked) => {});
+          updateCheck();
+        }
+      },{
+        label: 'Download Update',
+        id: 'dl-update',
+        enabled: false,
+        click(){
+          shell.openExternal('https://github.com/rampantepsilon/tweetdeck/releases');
         }
       }
     ]
   }
 ]
+
+const menu = Menu.buildFromTemplate(menuT)
+var updateItem = menu.getMenuItemById('dl-update');
 
 function createWindow () {
   var count = 0;
@@ -189,7 +213,6 @@ function createWindow () {
   //mainWindow.webContents.openDevTools()
 
   //Add Menu
-  const menu = Menu.buildFromTemplate(menuT)
   Menu.setApplicationMenu(menu)
 
   //Store Information About Size
@@ -273,6 +296,12 @@ function createWindow () {
     icon: __dirname + '/logo.png'
   })
 
+  const update = new Notification({
+    title: 'TweetDeck',
+    body: 'New Update Available! Download @ github.com/rampantepsilon/tweetdeck/releases',
+    icon: __dirname + '/logo.png'
+  })
+
   function promo(){
     promotion.show();
   }
@@ -287,6 +316,16 @@ function createWindow () {
       show = true;
     }
   })
+
+  setInterval(updateCheck, 3600000)
+
+  function updateNotif(){
+    if (commit > currentVer){
+      update.show();
+    }
+  }
+
+  setInterval(updateNotif, 28800000);
 }
 
 // This method will be called when Electron has finished
@@ -311,41 +350,60 @@ app.on('activate', () => {
   }
 })
 
+//Update Functions
+const options2 = {
+  type: 'info',
+  title: 'Updates Available',
+  message: 'New Update Available. Click the Download Update button in the About Menu.',
+  icon: __dirname + '/logo.png',
+  buttons: ['Ok']
+}
+
+const options3 = {
+  type: 'info',
+  title: 'No New Updates',
+  message: 'No New Update Available. Please check back later or wait for the notification.',
+  icon: __dirname + '/logo.png',
+  buttons: ['Ok']
+}
+
+function updateCheck(){
+  https.get(options, function (res) {
+    var json = '';
+    res.on('data', function (chunk) {
+        json += chunk;
+    });
+    res.on('end', function () {
+        if (res.statusCode === 200) {
+            try {
+              var data = JSON.parse(json)
+              commit = data[0].tag_name;
+              push();
+            } catch (e) {
+              console.log('Error parsing JSON!');
+            }
+        } else {
+            console.log('Status:', res.statusCode);
+        }
+    });
+  }).on('error', function (err) {
+        console.log('Error:', err);
+  });
+}
+
+function push(){
+  if (commit > currentVer){
+    updateItem.enabled = true;
+    dialog.showMessageBox(options2, (index) => {
+      event.sender.send('information-dialog-selection', index)
+    })
+    console.log("Done v" + commit + " found.");
+  } else {
+    dialog.showMessageBox(options3, (index) => {
+      event.sender.send('information-dialog-selection', index)
+    })
+    console.log("Done");
+  }
+}
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
-
-var currentVer = app.getVersion();
-
-var dialogOptions
-
-/*app.on('ready', function(){
-  var request = http.get('https://api.github.com/repos/rampantepsilon/tweetdeck/releases', function(result){
-    console.log(result);
-    var commit = result[0].tag_name;
-    var updateStatus;
-
-    for (i=0; i < result.length;i++){
-      if (result[i].tag_name != currentVer && result[i].tag_name > currentVer && result[i].tag_name.indexOf('alpha') == -1 && result[i].tag_name.indexOf('beta') == -1){
-        updateStatus = "New Version (v" + result[i].tag_name + ") available! <a href='https://github.com/rampantepsilon/tweetdeck/releases/' target='_blank'>Click Here to Download</a>";
-      }
-    }
-    if (updateStatus == "") {
-      updateStatus = "No Release Updates Available.";
-    }
-
-    dialogOptions = {
-      type: 'info',
-      buttons: [{
-        label: 'Update',
-        click: () => {
-          window.open('https://github.com/rampantepsilon/tweetdeck/releases');
-        }
-      },{
-        label: 'Close'
-      }],
-      title: 'Check For Updates',
-      message: 'No Updates',
-      detail: ''
-    }
-  })
-})*/
