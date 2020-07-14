@@ -1,5 +1,4 @@
 const { app, BrowserWindow, BrowserView, Menu, Tray, Notification, globalShortcut, shell, dialog } = require('electron')
-const $ = require('jquery');
 const path = require('path');
 const Store = require('./store.js');
 var https = require('https');
