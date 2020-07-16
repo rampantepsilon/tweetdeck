@@ -22,7 +22,7 @@ const changelogOptions = {
   buttons: ['Close'],
   title: 'Changelog',
   message: 'Changes in v2.1.0',
-  detail: '- Added Media tab to menu\n- Added YouTube, Twitch, Spotify, and OCRemix Radio\n- Cleaned up code for future releases\n- Added Dialog to ask if user wants to hide the media window too or not (Same Dialog appears if both are hidden and you try to reopen TweetDeck)\n\nIf you have a media location that you would like added to this list please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).'
+  detail: '- Added Media tab to menu\n- Added YouTube, Twitch, Spotify, and OCRemix Radio\n- Cleaned up code for future releases\n- Added Dialog to ask if user wants to hide the media window too or not (Same Dialog appears if both are hidden and you try to reopen TweetDeck)\n- Added Dialog at launch asking if you want to see all notifications for the app. (This will not remove the notification about it still running in the background or Twitter notifications)\n- Added menu item to change status of notifications\n\nIf you have a media location that you would like added to this list please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).'
 }
 
 //Global References & Variables
@@ -42,10 +42,31 @@ const store = new Store(
     configName: 'user-preferences',
     defaults:{
       windowBounds: { width: 1280, height: 720 }, //mainWindow default
-      musicBounds: { width: 620, height: 400 } //musicWindow default (Possibly change to bigger?)
+      musicBounds: { width: 620, height: 400 }, //musicWindow default (Possibly change to bigger?)
+      tooltip: 'yes',
+      tooltipLaunch: 'yes', //Default to show Notifications
     }
   }
 );
+
+//Get Stored Remember for Tooltip
+if (!store.get('tooltip')){
+  store.set('tooltip', 'yes')
+}
+if (!store.get('tooltipLaunch')){
+  store.set('tooltipLaunch', 'yes')
+}
+let tooltip = store.get('tooltip');
+let onLaunch = store.get('tooltipLaunch')
+var tooltipOptions = {
+  type: 'question',
+  title: 'Notification Preference',
+  message: 'Do you want to show all notifications from this app?\n\nPlease note: Even if you diable notifications, you will still be notified that TweetDeck will be running in the background. This will just turn off notifications about shortcuts and supporting the developer.\nYou can change this at any time from the Notification button in the menubar.',
+  icon: __dirname + '/logo.png',
+  checkboxLabel: 'Never Ask On Startup',
+  checkboxChecked: false,
+  buttons: ['Enable Notifications', 'Disable Notifications']
+}
 
 //Application menu
 /*Template of options*/
@@ -182,6 +203,23 @@ let menuT = [
       }
     ]
   },{
+    label: 'Notifications',
+    click(){
+      dialog.showMessageBox(tooltipOptions).then(result => {
+        if (result.checkboxChecked === true){
+          store.set('tooltipLaunch', 'no')
+        } else {
+          store.set('tooltipLaunch', 'yes')
+        }
+        if (result.response === 0){
+          store.set('tooltip', 'yes')
+        }
+        if (result.response === 1){
+          store.set('tooltip', 'no');
+        }
+      })
+    }
+  },{
     label: 'About',
     role: 'about',
     submenu: [
@@ -197,7 +235,7 @@ let menuT = [
       },{
         label: "Changelog",
         click(){
-          dialog.showMessageBox(null, changelogOptions, (response, checkboxChecked) =>{});
+          changeLog()
         }
       },{
         label: 'Check For Updates',
@@ -219,6 +257,11 @@ let menuT = [
 ]
 const menu = Menu.buildFromTemplate(menuT); //Add Template to Menu
 
+//Function for Changelog
+function changeLog(){
+  dialog.showMessageBox(null, changelogOptions, (response, checkboxChecked) =>{});
+}
+
 //MenuItem Variables
 var updateItem = menu.getMenuItemById('dl-update'); //Download Updates Button
 var upd8CheckBtn = menu.getMenuItemById('update-check'); //Check for Updates Button
@@ -238,6 +281,24 @@ function enableMusic(){
 
 //mainWindow function to be called by app.on('ready')
 function createWindow () {
+  //Call Notification Dialog before window loads
+  var lLoop = onLaunch;
+  if (lLoop == 'yes'){
+    dialog.showMessageBox(tooltipOptions).then(result => {
+      if (result.checkboxChecked === true){
+        store.set('tooltipLaunch', 'no')
+      } else {
+        store.set('tooltipLaunch', 'yes')
+      }
+      if (result.response === 0){
+        store.set('tooltip', 'yes')
+      }
+      if (result.response === 1){
+        store.set('tooltip', 'no');
+      }
+    })
+  }
+
   var show = true; //Variable for tracking if window is active
   let { width, height } = store.get('windowBounds'); //Get Stored window dimensions
 
@@ -321,7 +382,11 @@ function createWindow () {
   mainWindow.on('hide', function(event){
     show = false;
     myNotification.show();
-    not2 = setInterval(notif2, 1800000)
+    var loop = tooltip
+    if (loop == 'yes'){
+      not2 = setInterval(notif2, 1800000)
+      console.log('not2 started.')
+    }
   })
 
   // Emitted when the window is shown.
@@ -335,7 +400,11 @@ function createWindow () {
         })
       }
     }
-    clearInterval(not2);
+    var loop = tooltip
+    if (loop == 'yes'){
+      clearInterval(not2);
+      console.log('not2 stopped.')
+    }
   })
 
   //Open all links in the Default Browser
@@ -400,7 +469,10 @@ function createWindow () {
 
   //Function to show promotion via setInterval
   function promo(){
-    promotion.show();
+    var loop = tooltip
+    if (loop == 'yes'){
+      promotion.show();
+    }
   }
 
   //Function to show update if there is a new update via setInterval
@@ -424,7 +496,7 @@ function createWindow () {
   //Functions to be called upon completion
   updateCheck(); //Check for Updates on launch
   setInterval(updateCheck, 3600000) //Check for updates every hour
-  setInterval(promo, 7200000) //Promote support the creator every 2 hours
+  var promoTimer = setInterval(promo, 7200000) //Promote support the creator every 2 hours
   setInterval(updateNotif, 28800000); //Notify every 8 hours if there's a new update
 }
 
