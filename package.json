@@ -1,6 +1,6 @@
 {
   "name": "tweetdeck",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "TweetDeck is back on the Desktop in it's own Electron-based App",
   "main": "index.js",
   "scripts": {

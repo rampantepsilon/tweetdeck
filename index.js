@@ -21,8 +21,8 @@ const changelogOptions = {
   type: 'info',
   buttons: ['Close'],
   title: 'Changelog',
-  message: 'Changes in v2.1.0',
-  detail: '- Added Media tab to menu\n- Added YouTube, Twitch, Spotify, and OCRemix Radio\n- Cleaned up code for future releases\n- Added Dialog to ask if user wants to hide the media window too or not (Same Dialog appears if both are hidden and you try to reopen TweetDeck)\n- Added Dialog at launch asking if you want to see all notifications for the app. (This will not remove the notification about it still running in the background or Twitter notifications)\n- Added menu item to change status of notifications\n\nIf you have a media location that you would like added to this list please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).'
+  message: 'Changes in v3.0.1',
+  detail: '- Fixed issue where Changelog stated wrong version number\n- Fixed issue where tray logo was too large on Windows\n- Added Media tab to menu\n- Added YouTube, Twitch, Spotify, and OCRemix Radio\n- Cleaned up code for future releases\n- Added Dialog to ask if user wants to hide the media window too or not (Same Dialog appears if both are hidden and you try to reopen TweetDeck)\n- Added Dialog at launch asking if you want to see all notifications for the app. (This will not remove the notification about it still running in the background or Twitter notifications)\n- Added menu item to change status of notifications\n\nIf you have a media location that you would like added to this list please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).'
 }
 
 //Global References & Variables
@@ -419,7 +419,7 @@ function createWindow () {
   //Set Tray Menu
   tray.setContextMenu(Menu.buildFromTemplate([
     {
-      label: 'TweetDeck', enabled: false, icon: __dirname + '/logo.png'
+      label: 'TweetDeck', enabled: false, icon: __dirname + '/logo-small.png'
     },{
       type: 'separator'
     },{
