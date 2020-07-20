@@ -415,9 +415,8 @@ function createWindow () {
 
   //Initialize Tray
   tray = new Tray(__dirname + '/logo.png');
-
-  //Set Tray Menu
-  tray.setContextMenu(Menu.buildFromTemplate([
+  //Tray Menu Items
+  const trayMenu = Menu.buildFromTemplate([
     {
       label: 'TweetDeck', enabled: false, icon: __dirname + '/logo-small.png'
     },{
@@ -438,7 +437,16 @@ function createWindow () {
         app.quit();
       }
     }
-  ]));
+  ])
+  //Set Tray Menu
+  tray.setContextMenu(trayMenu);
+
+  //Add tray click function
+  if (process.platform == 'win32'){
+    tray.on('click', function(){
+      mainWindow.show();
+    })
+  }
 
   //Notifications
   const myNotification = new Notification({
