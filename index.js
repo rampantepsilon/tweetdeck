@@ -23,7 +23,13 @@ const changelogOptions = {
   buttons: ['Close'],
   title: 'Changelog',
   message: 'Changes in v3.0.2',
-  detail: `- Changed Tray icon behavior to reopen window on click (Windows Only)\n- Changed function for checking for updates on launch. If there's a new update it will now notify you on launch.\n- Fixed issue where app wouldn't remember being maximized on Windows\n\nIf you have a media location that you would like added to this list please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).`
+  detail: `- Changed Tray icon behavior to reopen window on click (Windows Only)
+- Changed function for checking for updates on launch. If there's a new update it will now notify you on launch.
+- Fixed issue where app wouldn't remember being maximized on Windows
+- Fixed issue where updater wouldn't resolve. This causes problems with v3.0.1 and previous builds. Please update immediately.
+- Change update method to be on private methods rather than GitHub API. This should be far more stable in the future.
+
+If you have a media location that you would like added to this list please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).`
 }
 
 //Global References & Variables
