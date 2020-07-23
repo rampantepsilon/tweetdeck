@@ -650,29 +650,28 @@ function updateCheck(){
     if (tdcv){
       version = tdcv;
       console.log(version);
+      if (version > currentVer){
+        updateItem.visible = true;
+        //If manualCheck then show dialog status
+        if (manualCheck == "true" || launchCheck == 'true'){
+          dialog.showMessageBox(options2, (index) => {
+            event.sender.send('information-dialog-selection', index)
+          })
+          launchCheck = 'false';
+        }
+        console.log("Done v" + version + " found.");
+      } else {
+        //If manualCheck then show dialog status
+        if (manualCheck == 'true'){
+          dialog.showMessageBox(options3, (index) => {
+            event.sender.send('information-dialog-selection', index)
+          })
+        }
+        console.log("Done");
+      }
+      upd8CheckBtn.enabled = true;
     } else {
       console.log('No Version');
     }
   })
-
-  if (version > currentVer){
-    updateItem.visible = true;
-    //If manualCheck then show dialog status
-    if (manualCheck == "true" || launchCheck == 'true'){
-      dialog.showMessageBox(options2, (index) => {
-        event.sender.send('information-dialog-selection', index)
-      })
-      launchCheck = 'false';
-    }
-    console.log("Done v" + commit + " found.");
-  } else {
-    //If manualCheck then show dialog status
-    if (manualCheck == 'true'){
-      dialog.showMessageBox(options3, (index) => {
-        event.sender.send('information-dialog-selection', index)
-      })
-    }
-    console.log("Done");
-  }
-  upd8CheckBtn.enabled = true;
 }
