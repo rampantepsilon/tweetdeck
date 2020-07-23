@@ -3,6 +3,7 @@ const { app, BrowserWindow, Menu, Tray, Notification, globalShortcut, shell, dia
 const https = require('https');
 const path = require('path');
 const Store = require('./store.js');
+const {updater} = require('./updater.js');
 
 //App information
 function title(){
@@ -625,13 +626,6 @@ app.on('activate', () => {
   }
 })
 
-//Update API variables
-var options = {
-  host: 'api.github.com',
-  path: '/repos/rampantepsilon/tweetdeck/releases',
-  headers: {'User-Agent': 'request'}
-}
-
 //Dialog boxes for manual Check for Updates
 const options2 = {
   type: 'info',
@@ -650,33 +644,18 @@ const options3 = {
 
 //Check for Updates function
 function updateCheck(){
-  upd8CheckBtn.enabled = false; //Disable Check for Updates button
-  https.get(options, function (res) {
-    var json = '';
-    res.on('data', function (chunk) {
-        json += chunk;
-    });
-    res.on('end', function () {
-        if (res.statusCode === 200) {
-            try {
-              var data = JSON.parse(json)
-              commit = data[0].tag_name;
-              push();
-            } catch (e) {
-              console.log('Error parsing JSON!');
-            }
-        } else {
-            console.log('Status:', res.statusCode);
-        }
-    });
-  }).on('error', function (err) {
-        console.log('Error:', err);
-  });
-}
+  var version;
 
-//Push information based on findings
-function push(){
-  if (commit > currentVer){
+  updater().then((tdcv) => {
+    if (tdcv){
+      version = tdcv;
+      console.log(version);
+    } else {
+      console.log('No Version');
+    }
+  })
+
+  if (version > currentVer){
     updateItem.visible = true;
     //If manualCheck then show dialog status
     if (manualCheck == "true" || launchCheck == 'true'){
