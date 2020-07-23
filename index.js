@@ -21,8 +21,8 @@ const changelogOptions = {
   type: 'info',
   buttons: ['Close'],
   title: 'Changelog',
-  message: 'Changes in v3.0.1',
-  detail: '- Fixed issue where Changelog stated wrong version number\n- Fixed issue where tray logo was too large on Windows\n- Added Media tab to menu\n- Added YouTube, Twitch, Spotify, and OCRemix Radio\n- Cleaned up code for future releases\n- Added Dialog to ask if user wants to hide the media window too or not (Same Dialog appears if both are hidden and you try to reopen TweetDeck)\n- Added Dialog at launch asking if you want to see all notifications for the app. (This will not remove the notification about it still running in the background or Twitter notifications)\n- Added menu item to change status of notifications\n\nIf you have a media location that you would like added to this list please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).'
+  message: 'Changes in v3.0.2',
+  detail: `- Changed Tray icon behavior to reopen window on click (Windows Only)\n- Changed function for checking for updates on launch. If there's a new update it will now notify you on launch.\n- Fixed issue where app wouldn't remember being maximized on Windows\n\nIf you have a media location that you would like added to this list please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).`
 }
 
 //Global References & Variables
@@ -34,7 +34,8 @@ var currentVer = versionNum(); //variable for versionNum where functions can't b
 var commit; //Info from GitHub showing newest tag for release
 var manualCheck = 'false'; //Tracker for if update check was initiated by user or automatic
 var musicOn = 'false'; //Tracker for if musicWindow has been created
-var mediaShow = 'false';
+var mediaShow = 'false'; //Tracker for if mediaWindow is shown
+var launchCheck = 'true'; //Tracker for first check
 
 //Initialize Storage Method Store
 const store = new Store(
@@ -45,6 +46,7 @@ const store = new Store(
       musicBounds: { width: 620, height: 400 }, //musicWindow default (Possibly change to bigger?)
       tooltip: 'yes',
       tooltipLaunch: 'yes', //Default to show Notifications
+      isMaximized: 'no' //Default to basic window size (Windows Only)
     }
   }
 );
@@ -55,6 +57,9 @@ if (!store.get('tooltip')){
 }
 if (!store.get('tooltipLaunch')){
   store.set('tooltipLaunch', 'yes')
+}
+if (!store.get('isMaximized')){
+  store.set('isMaximized', 'no')
 }
 let tooltip = store.get('tooltip');
 let onLaunch = store.get('tooltipLaunch')
@@ -247,7 +252,7 @@ let menuT = [
       },{
         label: 'Download Update',
         id: 'dl-update',
-        enabled: false,
+        visible: false,
         click(){
           shell.openExternal('https://github.com/rampantepsilon/tweetdeck/releases');
         }
@@ -301,6 +306,7 @@ function createWindow () {
 
   var show = true; //Variable for tracking if window is active
   let { width, height } = store.get('windowBounds'); //Get Stored window dimensions
+  let isMaximized = store.get('isMaximized');
 
   //Window Variables
   const mainWindow = new BrowserWindow({
@@ -313,6 +319,12 @@ function createWindow () {
       nodeIntegration: true
     }
   })
+
+  if (process.platform == 'win32'){
+    if (isMaximized == 'yes'){
+      mainWindow.maximize();
+    }
+  }
 
   //Page to load (Leaving other file commented out until finished)
   mainWindow.loadURL('https://tweetdeck.twitter.com')
@@ -361,6 +373,16 @@ function createWindow () {
         }
       })
     }
+  })
+
+  // Emitted when the window is maximized.
+  mainWindow.on('maximize', function(event){
+    store.set('isMaximized', 'yes')
+  })
+
+  // Emitted when the window exits a maximized state.
+  mainWindow.on('unmaximize', function(event){
+    store.set('isMaximized', 'no')
   })
 
   // Emitted when the window is closed.
@@ -502,7 +524,7 @@ function createWindow () {
   })
 
   //Functions to be called upon completion
-  updateCheck(); //Check for Updates on launch
+  setTimeout(updateCheck, 3000); //Check for Updates on launch
   setInterval(updateCheck, 3600000) //Check for updates every hour
   var promoTimer = setInterval(promo, 7200000) //Promote support the creator every 2 hours
   setInterval(updateNotif, 28800000); //Notify every 8 hours if there's a new update
@@ -655,12 +677,13 @@ function updateCheck(){
 //Push information based on findings
 function push(){
   if (commit > currentVer){
-    updateItem.enabled = true;
+    updateItem.visible = true;
     //If manualCheck then show dialog status
-    if (manualCheck == "true"){
+    if (manualCheck == "true" || launchCheck == 'true'){
       dialog.showMessageBox(options2, (index) => {
         event.sender.send('information-dialog-selection', index)
       })
+      launchCheck = 'false';
     }
     console.log("Done v" + commit + " found.");
   } else {
