@@ -11,7 +11,7 @@ function title(){
   return title;
 }
 function buildNum(){
-  const build = '2020.07.15';
+  const build = '2020.07.23';
   return build;
 }
 function versionNum(){
