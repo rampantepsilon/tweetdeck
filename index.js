@@ -22,8 +22,11 @@ const changelogOptions = {
   type: 'info',
   buttons: ['Close'],
   title: 'Changelog',
-  message: 'Changes in v3.0.2',
-  detail: `- Changed Tray icon behavior to reopen window on click (Windows Only)
+  message: 'Changes in v3.0.3',
+  detail: `- HOTFIX: Fixed issue where the update dialog box was showing on every check
+
+Changelog from v3.0.2
+- Changed Tray icon behavior to reopen window on click (Windows Only)
 - Changed function for checking for updates on launch. If there's a new update it will now notify you on launch.
 - Fixed issue where app wouldn't remember being maximized on Windows
 - Fixed issue where updater wouldn't resolve. This causes problems with v3.0.1 and previous builds. Please update immediately.
@@ -673,9 +676,9 @@ function updateCheck(){
           dialog.showMessageBox(options2, (index) => {
             event.sender.send('information-dialog-selection', index)
           })
-          launchCheck = 'false';
         }
         console.log("Done v" + version + " found.");
+        launchCheck = 'false';
       } else {
         //If manualCheck then show dialog status
         if (manualCheck == 'true'){
@@ -684,6 +687,7 @@ function updateCheck(){
           })
         }
         console.log("Done");
+        launchCheck = 'false';
       }
     })
     .catch(error => {
