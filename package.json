@@ -14,12 +14,11 @@
   "author": "Tom \"RampantEpsilon\" Ware",
   "license": "ISC",
   "dependencies": {
-    "request": "^2.88.2",
-    "request-promise": "^4.2.6"
+    "axios": "^0.19.2"
   },
   "devDependencies": {
     "electron": "^9.1.0",
     "jquery": "^3.5.1",
-    "xhr2": "*"
+    "xhr2": "^0.2.0"
   }
 }

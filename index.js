@@ -3,7 +3,7 @@ const { app, BrowserWindow, Menu, Tray, Notification, globalShortcut, shell, dia
 const https = require('https');
 const path = require('path');
 const Store = require('./store.js');
-const {updater} = require('./updater.js');
+const axios = require('axios');
 
 //App information
 function title(){
@@ -531,7 +531,7 @@ function createWindow () {
   })
 
   //Functions to be called upon completion
-  setTimeout(updateCheck, 3000); //Check for Updates on launch
+  updateCheck() //Initial update check
   setInterval(updateCheck, 3600000) //Check for updates every hour
   var promoTimer = setInterval(promo, 7200000) //Promote support the creator every 2 hours
   setInterval(updateNotif, 28800000); //Notify every 8 hours if there's a new update
@@ -650,12 +650,22 @@ const options3 = {
 
 //Check for Updates function
 function updateCheck(){
-  var version;
+  upd8CheckBtn.enabled = false;
 
-  updater().then((tdcv) => {
-    if (tdcv){
-      version = tdcv;
-      console.log(version);
+  //Fix Unauthorized Error
+  const instance = axios.create({
+    httpsAgent: new https.Agent({
+      rejectUnauthorized: false
+    })
+  });
+
+  //Get New Version Info
+  instance.get('http://rampantepsilon.site/projectResources/tweetdeckVersion.js')
+    .then(response => {
+      var version = response.data;
+      version = version.substr(0,5);
+
+      //Complete Update Check
       if (version > currentVer){
         updateItem.visible = true;
         //If manualCheck then show dialog status
@@ -675,9 +685,10 @@ function updateCheck(){
         }
         console.log("Done");
       }
-      upd8CheckBtn.enabled = true;
-    } else {
-      console.log('No Version');
-    }
-  })
+    })
+    .catch(error => {
+      console.log(error);
+    })
+
+  upd8CheckBtn.enabled = true;
 }
