@@ -23,8 +23,9 @@ const changelogOptions = {
   buttons: ['Close'],
   title: 'Changelog',
   message: 'Changes in v3.1.0',
-  detail: `- Added Email to the Menu
+  detail: `- Added Email to the Menu (Gmail, Yahoo, Outlook, and AOL at launch)
 - Fixed bug where app would ask about the Media window on minimize even if the window wasn't visible.
+- Change Tray Icon to show menu when clicked rather than focusing the window.
 
 If you have any suggestions for the app, please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).`
 }
@@ -549,7 +550,7 @@ function createWindow () {
   //Initialize Tray
   tray = new Tray(__dirname + '/logo.png');
   //Tray Menu Items
-  const trayMenu = Menu.buildFromTemplate([
+  const trayOptions = [
     {
       label: 'TweetDeck', enabled: false, icon: __dirname + '/logo-small.png'
     },{
@@ -580,14 +581,15 @@ function createWindow () {
         app.quit();
       }
     }
-  ])
+  ];
+  const trayMenu = Menu.buildFromTemplate(trayOptions);
   //Set Tray Menu
   tray.setContextMenu(trayMenu);
 
   //Add tray click function
   if (process.platform == 'win32'){
     tray.on('click', function(){
-      mainWindow.show();
+      tray.popUpContextMenu(trayOptions);
     })
   }
 
