@@ -528,6 +528,11 @@ function createWindow () {
         })
       }
     }
+    if (process.platform == 'win32'){
+      if (isMaximized == 'yes'){
+        mainWindow.maximize();
+      }
+    }
     var loop = tooltip
     if (loop == 'yes'){
       clearInterval(not2);
@@ -726,6 +731,11 @@ function musicWin(location){
 
   musicWindow.on('show', function(event){
     mediaShow = 'true';
+    if (process.platform == 'win32'){
+      if (mIsMaximized == 'yes'){
+        musicWindow.maximize();
+      }
+    }
   })
 
   // Emitted when the window is closed.
@@ -816,6 +826,11 @@ function emailWin(location){
 
   emailWindow.on('show', function(event){
     emailShow = 'true';
+    if (process.platform == 'win32'){
+      if (eIsMaximized == 'yes'){
+        emailWindow.maximize();
+      }
+    }
   })
 
   // Emitted when the window is closed.
