@@ -416,14 +416,14 @@ function createWindow () {
   //Options for dialog asking to hide/show Email too
   var optionsHEmail = {
     type: 'question',
-    title: 'Media Confirmation',
+    title: 'Email Confirmation',
     message: 'TweetDeck is trying to hide all windows.\nDo you want to hide the Email window?',
     icon: __dirname + '/logo.png',
     buttons: ['Yes', 'No']
   }
   var optionsSEmail = {
     type: 'question',
-    title: 'Media Confirmation',
+    title: 'Email Confirmation',
     message: 'TweetDeck is trying to show all windows.\nDo you want to show the Email window?',
     icon: __dirname + '/logo.png',
     buttons: ['Yes', 'No']
