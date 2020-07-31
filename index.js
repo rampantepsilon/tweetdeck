@@ -23,10 +23,12 @@ const changelogOptions = {
   type: 'info',
   buttons: ['Close'],
   title: 'Changelog',
-  message: 'Changes in v3.1.0',
-  detail: `- Added Email to the Menu (Gmail, Yahoo, Outlook, and AOL at launch)
-- Fixed bug where app would ask about the Media window on minimize even if the window wasn't visible.
-- Change Tray Icon to show menu when clicked rather than focusing the window.
+  message: 'Changes in v4.0.0-beta1',
+  detail: `- Complete rework of application. New layout & more.
+- Added ability to add a custom background. NOTE: Background image will need to be on host computer. After adding, if the image is moved/deleted the app will no longer have the image.
+- Changed Tray to allow Checking for Updates to occur there.
+- Added Changelog to Tray icon
+- Moved Notification changer to be under App menu item. Background Image selector is there as well.
 
 If you have any suggestions for the app, please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).`
 }
