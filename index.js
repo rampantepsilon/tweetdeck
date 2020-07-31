@@ -520,7 +520,7 @@ function createWindow () {
   }
 
   //Register Global Shortcut
-  globalShortcut.register('CommandOrControl+Alt+Shift+T', () => {
+  globalShortcut.register('CommandOrControl+Alt+Shift+R', () => {
     if (show == true){
       mainWindow.hide();
       show = false;
