@@ -207,6 +207,10 @@ function popOut(){
   })
 
 	secondWindow.webContents.on('new-window', (event, url) => {
+    var windows = BrowserWindow.getAllWindows();
+    if (windows[2]){
+      windows[0].close();
+    }
     shell.openExternal(url);
   })
 
