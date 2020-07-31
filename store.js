@@ -27,6 +27,11 @@ class Store {
     // we might lose that data. Note that in a real app, we would try/catch this.
     fs.writeFileSync(this.path, JSON.stringify(this.data));
   }
+
+  del(key){
+    delete this.data[key];
+    fs.writeFileSync(this.path, JSON.stringify(this.data));
+  }
 }
 
 function parseDataFile(filePath, defaults) {
