@@ -60,4 +60,11 @@ function background(){
   document.body.style.backgroundPosition = "center center"
   document.body.style.backgroundSize = '100%';
   //document.body.style.backgroundSize = cover;
+  redirect('tweetdeck')
+
+  if (storeR.get('menuCollapsed') == 'yes'){
+    collapse();
+  } else {
+    document.getElementById('hide').style.visibility = 'hidden'
+  }
 }

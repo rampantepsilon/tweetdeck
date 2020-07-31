@@ -8,11 +8,11 @@ const axios = require('axios');
 
 //App information
 function title(){
-  var title = 'TweetDeck Standalone Client';
+  var title = 'RampantDock';
   return title;
 }
 function buildNum(){
-  const build = '2020.07.29';
+  const build = '2020.07.31';
   return build;
 }
 function versionNum(){
@@ -33,18 +33,9 @@ If you have any suggestions for the app, please reach out to me on Twitter @ramp
 
 //Global References & Variables
 let mainWindow; //Main Window
-let musicWindow; //Music Window
-let emailWindow; //Email Window
-var homeWindow; //Tracker for Music Window in mainWindow
-var emailWindowT; //Tracker for Email Window in mainWindow
 var not2; //Tracker for if notification2 should be shown
 var currentVer = versionNum(); //variable for versionNum where functions can't be called
-var commit; //Info from GitHub showing newest tag for release
 var manualCheck = 'false'; //Tracker for if update check was initiated by user or automatic
-var musicOn = 'false'; //Tracker for if musicWindow has been created
-var mediaShow = 'false'; //Tracker for if mediaWindow is shown
-var emailOn = 'false'; //Tracker for if emailWindow has been created
-var emailShow = 'false'; //Tracker for if emailWindow is shown
 var launchCheck = 'true'; //Tracker for first check
 
 //Initialize Storage Method Store
@@ -57,6 +48,8 @@ const store = new Store(
       tooltip: 'yes',
       tooltipLaunch: 'yes', //Default to show Notifications
       isMaximized: 'no', //Default to basic window size (Windows Only)
+      isMaximized2: 'no', //Default to second window size (Windows Only)
+      menuCollapsed: 'no' //Sidebar Collapsed
     }
   }
 );
@@ -98,6 +91,9 @@ if (!store.get('isMaximized2')){
 }
 if (!store.get('win2Bounds')){
   store.set('win2Bounds', {width: 800, height: 450});
+}
+if (!store.get('menuCollapsed')){
+  store.set('menuCollapsed', 'no')
 }
 let tooltip = store.get('tooltip');
 let onLaunch = store.get('tooltipLaunch')
@@ -322,12 +318,12 @@ function createWindow () {
   //mainWindow.loadURL('https://tweetdeck.twitter.com')
 
   /*View Testing*/
+  mainWindow.loadFile('src/index.html')
   const view = new BrowserView()
   mainWindow.setBrowserView(view)
   view.setBounds({ x: 235, y: 20, width: (width - 265), height: (height - 100) })
   view.setAutoResize({ width: true, height: true })
   view.webContents.loadURL('https://tweetdeck.twitter.com')
-  mainWindow.loadFile('src/index.html')
 
   // Open the DevTools (Uncomment to open on launch. Press Ctrl+Alt+I to open in app with or without this line)
   //NOTE: DevTools will not show with BrowserView
@@ -337,38 +333,6 @@ function createWindow () {
   Menu.setApplicationMenu(menu)
   //mainWindow.setMenu(menu);
 
-  //Options for dialog asking to hide/show music too
-  var optionsHMusic = {
-    type: 'question',
-    title: 'Media Confirmation',
-    message: 'TweetDeck is trying to hide all windows.\nDo you want to hide the Media window?',
-    icon: __dirname + '/logo.png',
-    buttons: ['Yes', 'No']
-  }
-  var optionsSMusic = {
-    type: 'question',
-    title: 'Media Confirmation',
-    message: 'TweetDeck is trying to show all windows.\nDo you want to show the Media window?',
-    icon: __dirname + '/logo.png',
-    buttons: ['Yes', 'No']
-  }
-
-  //Options for dialog asking to hide/show Email too
-  var optionsHEmail = {
-    type: 'question',
-    title: 'Email Confirmation',
-    message: 'TweetDeck is trying to hide all windows.\nDo you want to hide the Email window?',
-    icon: __dirname + '/logo.png',
-    buttons: ['Yes', 'No']
-  }
-  var optionsSEmail = {
-    type: 'question',
-    title: 'Email Confirmation',
-    message: 'TweetDeck is trying to show all windows.\nDo you want to show the Email window?',
-    icon: __dirname + '/logo.png',
-    buttons: ['Yes', 'No']
-  }
-
   //Store Information About Size
   mainWindow.on('resize', () => {
     //Get Bounds
@@ -377,7 +341,7 @@ function createWindow () {
     store.set('windowBounds', { width, height });
   })
 
-  // Emitted when the window is minimized.
+  // Emitted when the window is minimized. (COMMENT OUT)
   /*mainWindow.on('minimize', function(event){
     event.preventDefault();
     show = false;
@@ -405,6 +369,10 @@ function createWindow () {
   // Emitted when the window is maximized.
   mainWindow.on('maximize', function(event){
     store.set('isMaximized', 'yes')
+    //Get Bounds
+    let { width, height } = mainWindow.getBounds();
+    //Save Information
+    store.set('windowBounds', { width, height });
   })
 
   // Emitted when the window exits a maximized state.
@@ -417,24 +385,6 @@ function createWindow () {
     event.preventDefault();
     show = false;
     mainWindow.hide(); //Pass all other variables to .on('hide')
-    if (musicOn == 'true'){
-      if (mediaShow == 'true'){
-        dialog.showMessageBox(optionsHMusic).then(result => {
-          if (result.response === 0){
-            homeWindow.hide();
-          }
-        })
-      }
-    }
-    if (emailOn == 'true'){
-      if (emailShow == 'true'){
-        dialog.showMessageBox(optionsHEmail).then(result => {
-          if (result.response === 0){
-            emailWindowT.hide();
-          }
-        })
-      }
-    }
     event.returnValue = false;
   })
 
@@ -451,24 +401,6 @@ function createWindow () {
 
   // Emitted when the window is shown.
   mainWindow.on('show',function(event){
-    if (musicOn == 'true'){
-      if (mediaShow == 'false'){
-        dialog.showMessageBox(optionsSMusic).then(result => {
-          if (result.response === 0){
-            homeWindow.show();
-          }
-        })
-      }
-    }
-    if (emailOn == 'true'){
-      if (emailShow == 'false'){
-        dialog.showMessageBox(optionsSEmail).then(result => {
-          if (result.response === 0){
-            emailWindowT.show();
-          }
-        })
-      }
-    }
     if (process.platform == 'win32'){
       if (isMaximized == 'yes'){
         mainWindow.maximize();
@@ -506,9 +438,12 @@ function createWindow () {
       type: 'separator'
     },{
       label: 'Open Second Window',
+      id: 'win2',
       click: function () {
         var windows = BrowserWindow.getAllWindows();
-        windows[0].show();
+        if (windows[1]){
+          windows[0].show();
+        }
       }
     },{
       type: 'separator'

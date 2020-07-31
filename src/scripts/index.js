@@ -7,24 +7,53 @@ const remote = electron.remote;
 const Store = require('../store.js');
 
 //Initialize Storage Method Store
-const store = new Store(
+const storeR = new Store(
   {
     configName: 'user-preferences',
     defaults:{
       windowBounds: { width: 1280, height: 720 }, //mainWindow default
-      win2Bounds: { width: 620, height: 400 }, //secondWindow default (Possibly change to bigger?)
+      win2Bounds: { width: 800, height: 450 }, //secondWindow default
       tooltip: 'yes',
       tooltipLaunch: 'yes', //Default to show Notifications
       isMaximized: 'no', //Default to basic window size (Windows Only)
-      isMaximized2: 'no'
+      isMaximized2: 'no', //Default to second window size (Windows Only)
+      menuCollapsed: 'no' //Sidebar Collapsed
     }
   }
 );
 
 let currentLoc = 'tweetdeck';
 
+function collapse(){
+  let { width, height } = storeR.get('windowBounds'); //Get Stored window dimensions
+  var views = BrowserView.getAllViews();
+  views[0].setBounds({ x: 85, y: 15, width: (width - 105), height: (height - 100) });
+  document.getElementById('hide').style.visibility = 'visible'
+  document.getElementById('init').style.display = 'none';
+  document.getElementById('poTable').style.width = '60px';
+  document.getElementById('poText').style.display = 'none';
+  document.getElementById('poIcon').style.top = '-15px';
+  document.getElementById('poIcon').style.left = '10px';
+
+  storeR.set('menuCollapsed', 'yes')
+}
+
+function expand(){
+  let { width, height } = storeR.get('windowBounds'); //Get Stored window dimensions
+  var views = BrowserView.getAllViews();
+  views[0].setBounds({ x: 235, y: 15, width: (width - 265), height: (height - 100) });
+  document.getElementById('hide').style.visibility = 'hidden'
+  document.getElementById('init').style.display = 'block';
+  document.getElementById('poTable').style.width = '220px';
+  document.getElementById('poText').style.display = 'block';
+  document.getElementById('poIcon').style.top = '4px';
+  document.getElementById('poIcon').style.left = '20px';
+
+  storeR.set('menuCollapsed', 'no')
+}
+
 function redirect(location){
-	let { width, height } = store.get('windowBounds'); //Get Stored window dimensions
+	let { width, height } = storeR.get('windowBounds'); //Get Stored window dimensions
 
 	var views = BrowserView.getAllViews()
 	views[0].destroy();
@@ -32,7 +61,12 @@ function redirect(location){
 	let homeWindow = remote.getCurrentWindow();
 	let view = new BrowserView();
   homeWindow.setBrowserView(view);
-  view.setBounds({ x: 235, y: 20, width: (width - 265), height: (height - 100) });
+  if (storeR.get('menuCollapsed') == 'no'){
+    view.setBounds({ x: 235, y: 15, width: (width - 265), height: (height - 100) });
+  }
+  if (storeR.get('menuCollapsed') == 'yes'){
+    view.setBounds({ x: 85, y: 15, width: (width - 105), height: (height - 100) });
+  }
   view.setAutoResize({ width: true, height: true })
 	view.webContents.on('new-window', (event, url) => {
     event.preventDefault();
@@ -77,19 +111,22 @@ function redirect(location){
 }
 
 function popOut(){
-	if (!store.get('win2Bounds')){
-		store.set('win2Bounds', { width: 620, height: 400 })
+  var iconVar = currentLoc + ".png"
+	if (!storeR.get('win2Bounds')){
+		storeR.set('win2Bounds', { width: 620, height: 400 })
 	}
-  if (!store.get('isMaximized2')){
-    store.set('isMaximized2', 'no');
+  if (!storeR.get('isMaximized2')){
+    storeR.set('isMaximized2', 'no');
   }
-	let { width, height } = store.get('win2Bounds');
-  let isMaximized2 = store.get('isMaximized2');
+	let { width, height } = storeR.get('win2Bounds');
+  let isMaximized2 = storeR.get('isMaximized2');
+
+  console.log(iconVar);
 
 	const secondWindow = new BrowserWindow({
     width: width,
     height: height,
-    icon: __dirname + "/logo.png",
+    icon: __dirname + '\\images\\' + iconVar,
     title: currentLoc,
     webPreferences: {
       nativeWindowOpen: true,
@@ -135,12 +172,12 @@ function popOut(){
 
 	// Emitted when the window is maximized.
   secondWindow.on('maximize', function(event){
-    store.set('isMaximized2', 'yes')
+    storeR.set('isMaximized2', 'yes')
   })
 
   // Emitted when the window exits a maximized state.
   secondWindow.on('unmaximize', function(event){
-    store.set('isMaximized2', 'no')
+    storeR.set('isMaximized2', 'no')
   })
 
   //Store Information About Size
@@ -148,7 +185,7 @@ function popOut(){
     //Get Bounds
     let { width, height } = secondWindow.getBounds();
     //Save Information
-    store.set('win2Bounds', { width, height });
+    storeR.set('win2Bounds', { width, height });
   })
 
   secondWindow.on('minimize', () => {
