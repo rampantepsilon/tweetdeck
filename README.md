@@ -1,21 +1,16 @@
-<h1>Unofficial TweetDeck Standalone Client</h1>
-<p>The goal of this project was to bring back the TweetDeck Desktop client that they stopped support for a while back. While this is basically an Electron wrapped website, I've modified the project to have a few new features.</p>
+<h1>RampantDock</h1>
+<p>Before explaining this app, I want to thank everyone that followed this app when it only focused on TweetDeck! The original goal of this project was to bring back the TweetDeck Desktop client that they stopped support for a while back.</p>
+<p>After 8 releases and tons of work, I'm pleased to announce that I've changed this app from focusing on TweetDeck to focusing on highly needed resources! This app can help you by checking emails, tweets, and even playing music or background noise.</p>
 <h3>Features</h3>
 <ul>
-  <li>Notifications letting the user know about new features. This will be something that will persist and there will be at least one notification pointing to the changelog in the future.</li>
-  <li>Minimize and Close of the window will send it to the taskbar. You will be notified when this happens so you don't think you've closed the program when it's still running.</li>
-  <li>Global Hotkey support. Press Ctrl+Alt+Shift+T to hide or show the window. Regardless of visibility, the app will continue running.</li>
+  <li>Notifications letting the user know about features. This will be something that will persist and there will be at least one notification pointing to the changelog in the future. [TBD on full implementation]</li>
+  <li>Closing the window will send it to the taskbar. You will be notified when this happens so you don't think you've closed the program when it's still running.</li>
+  <li>Global Hotkey support. Press Ctrl+Alt+R to hide or show the window. Regardless of visibility, the app will continue running.</li>
   <li>Window size will be remembered between uses. Future updates will build on this for saving other information if the user wishes.</li>
-  <li>Link handling so all links open in the default browser (v2.0.0+)</li>
-  <li>Update Checker (v2.0.0+)</li>
-  <li>Media Player (v3.0.0+) with links to:
-    <ul>
-      <li>YouTube</li>
-      <li>Twitch</li>
-      <li>Spotify</li>
-      <li>OCRemix Radio</li>
-    </ul>
-  </li>
-  <li>Ability to turn app notifications on and off (v3.0.0)</li>
+  <li>Link handling so all links open in the default browser.</li>
+  <li>Automatic Update Notifier</li>
+  <li>Ability to turn app notifications on and off.</li>
+  <li>Ability to pop out one window for multitasking.</li>
+  <li>Customizable background image.</li>
 </ul>
 <p>Have suggestions, questions, or issues? Post in the Issues tab and I'll be more than happy to help.</p>
