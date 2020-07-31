@@ -1,15 +1,6 @@
 const path = require('path');
 const fs = require('fs');
 
-const bckgrnd = new Store(
-  {
-    configName: 'background',
-    defaults:{
-      url: 'none',
-    }
-  }
-);
-
 // Importing dialog module using remote
 const dialog = electron.remote.dialog;
 
@@ -45,7 +36,7 @@ function uploadBackground() {
 		global.filepath = global.filepath.replace(/\\/g,'\/');
     global.filepath = 'file:///' + global.filepath;
     console.log(global.filepath);
-    bckgrnd.set('url', global.filepath);
+    storeR.set('bckgrndUrl', global.filepath);
     document.body.style.backgroundImage = 'url("' + global.filepath + '")';
     document.body.style.backgroundPosition = "center center"
     document.body.style.backgroundSize = '100%';
@@ -56,9 +47,11 @@ function uploadBackground() {
 }
 
 function background(){
-  document.body.style.backgroundImage = 'url("' + bckgrnd.get('url') + '")';
-  document.body.style.backgroundPosition = "center center"
-  document.body.style.backgroundSize = '100%';
+  if(storeR.get('bckgrndUrl') != 'none'){
+    document.body.style.backgroundImage = 'url("' + storeR.get('bckgrndUrl') + '")';
+    document.body.style.backgroundPosition = "center center"
+    document.body.style.backgroundSize = '100%';
+  }
   //document.body.style.backgroundSize = cover;
   redirect('tweetdeck')
 

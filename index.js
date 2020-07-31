@@ -3,7 +3,7 @@ const { app, BrowserView, BrowserWindow, Menu, Tray, Notification, globalShortcu
 const https = require('https');
 const path = require('path');
 const fs = require('fs');
-const Store = require('./store.js');
+const Store = require('./src/store.js');
 const axios = require('axios');
 
 //App information
@@ -41,10 +41,11 @@ var manualCheck = 'false'; //Tracker for if update check was initiated by user o
 var launchCheck = 'true'; //Tracker for first check
 
 //Initialize Storage Method Store
-const store = new Store(
+global.store = new Store(
   {
     configName: 'user-preferences',
     defaults:{
+      bckgrndUrl: 'none',
       windowBounds: { width: 1280, height: 720 }, //mainWindow default
       win2Bounds: { width: 800, height: 450 }, //secondWindow default
       tooltip: 'yes',
@@ -55,28 +56,6 @@ const store = new Store(
     }
   }
 );
-const bckgrnd = new Store(
-  {
-    configName: 'background',
-    defaults:{
-      url: 'none',
-    }
-  }
-);
-
-//Remove Old Value on Launch
-if (store.get('mIsMaximized')){
-  store.del('mIsMaximized');
-}
-if (store.get('musicBounds')){
-  store.del('musicBounds');
-}
-if (store.get('eIsMaximized')){
-  store.del('eIsMaximized');
-}
-if (store.get('emailBounds')){
-  store.del('emailBounds');
-}
 
 //Get Stored Remember for Tooltip
 if (!store.get('tooltip')){
@@ -96,6 +75,9 @@ if (!store.get('win2Bounds')){
 }
 if (!store.get('menuCollapsed')){
   store.set('menuCollapsed', 'no')
+}
+if (!store.get('bckgrndUrl')){
+  store.set('bckgrndUrl','none')
 }
 let tooltip = store.get('tooltip');
 let onLaunch = store.get('tooltipLaunch')
@@ -652,7 +634,7 @@ function uploadBackground() {
 		global.filepath = global.filepath.replace(/\\/g,'\/');
     global.filepath = 'file:///' + global.filepath;
     console.log(global.filepath);
-    bckgrnd.set('url', global.filepath);
+    store.set('bckgrndUrl', global.filepath);
     BrowserWindow.getFocusedWindow().reload();
 		}
 	}).catch(err => {

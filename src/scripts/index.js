@@ -4,13 +4,14 @@ const BrowserWindow = electron.remote.BrowserWindow;
 const shell = electron.remote.shell;
 const remote = electron.remote;
 
-const Store = require('../store.js');
+const Store = require('../src/store.js')
 
 //Initialize Storage Method Store
-const storeR = new Store(
+var storeR = remote.getGlobal('store') /*new Store(
   {
     configName: 'user-preferences',
     defaults:{
+      bckgrndUrl: 'none',
       windowBounds: { width: 1280, height: 720 }, //mainWindow default
       win2Bounds: { width: 800, height: 450 }, //secondWindow default
       tooltip: 'yes',
@@ -20,14 +21,15 @@ const storeR = new Store(
       menuCollapsed: 'no' //Sidebar Collapsed
     }
   }
-);
+);*/
 
 let currentLoc = 'tweetdeck';
 
 function collapse(){
   let { width, height } = storeR.get('windowBounds'); //Get Stored window dimensions
   var views = BrowserView.getAllViews();
-  views[0].setBounds({ x: 85, y: 15, width: (width - 105), height: (height - 100) });
+  views[0].setBounds({ x: 85, y: 15, width: (width - 125), height: (height - 100) });
+  views[0].setAutoResize({ width: true, height: true })
   document.getElementById('hide').style.visibility = 'visible'
   document.getElementById('init').style.display = 'none';
   document.getElementById('poTable').style.width = '60px';
@@ -41,7 +43,7 @@ function collapse(){
 function expand(){
   let { width, height } = storeR.get('windowBounds'); //Get Stored window dimensions
   var views = BrowserView.getAllViews();
-  views[0].setBounds({ x: 235, y: 15, width: (width - 265), height: (height - 100) });
+  views[0].setBounds({ x: 235, y: 15, width: (width - 275), height: (height - 100) });
   document.getElementById('hide').style.visibility = 'hidden'
   document.getElementById('init').style.display = 'block';
   document.getElementById('poTable').style.width = '220px';
@@ -56,16 +58,16 @@ function redirect(location){
 	let { width, height } = storeR.get('windowBounds'); //Get Stored window dimensions
 
 	var views = BrowserView.getAllViews()
-	views[0].destroy();
+	//views[0].destroy();
 	console.log(BrowserView.getAllViews())
 	let homeWindow = remote.getCurrentWindow();
-	let view = new BrowserView();
-  homeWindow.setBrowserView(view);
+	let view = views[0]
+  //homeWindow.setBrowserView(view);
   if (storeR.get('menuCollapsed') == 'no'){
-    view.setBounds({ x: 235, y: 15, width: (width - 265), height: (height - 100) });
+    view.setBounds({ x: 235, y: 15, width: (width - 275), height: (height - 100) });
   }
   if (storeR.get('menuCollapsed') == 'yes'){
-    view.setBounds({ x: 85, y: 15, width: (width - 105), height: (height - 100) });
+    view.setBounds({ x: 85, y: 15, width: (width - 125), height: (height - 100) });
   }
   view.setAutoResize({ width: true, height: true })
 	view.webContents.on('new-window', (event, url) => {
