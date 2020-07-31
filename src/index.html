@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+    	html, body
+    	{
+    		height: 99%;
+        background-color: #333333;
+    	}
+      #links
+      {
+        background-color: #333333;
+        color: #ffffff;
+        height: 50px;
+        border-radius: 25px;
+      }
+      #links:hover
+      {
+        background-color: #0000ff;
+        color: #999999;
+      }
+  	</style>
+
+    <script src='scripts/index.js'></script>
+  </head>
+
+  <body onload='background()'>
+    <table width="220px" style='padding-left: 5px; padding-top: 10px;'>
+    	<tr style="width: 98%;">
+        <td id='links' align='center' style="width: 100%;" valign='middle'>
+          <div onclick='redirect("tweetdeck")'>TweetDeck</div>
+        </td>
+    	</tr>
+      <tr>
+        <td id='links' align='center' style="width: 100%;" valign='middle'>
+          <div onclick='redirect("gmail")'>Gmail</div>
+        </td>
+    	</tr>
+      <tr>
+        <td id='links' align='center' style="width: 100%;" valign='middle'>
+          <div onclick='redirect("yahoo")'>Yahoo</div>
+        </td>
+    	</tr>
+      <tr>
+        <td id='links' align='center' style="width: 100%;" valign='middle'>
+          <div onclick='redirect("outlook")'>Outlook</div>
+        </td>
+    	</tr>
+      <tr>
+        <td id='links' align='center' style="width: 100%;" valign='middle'>
+          <div onclick='redirect("aol")'>AOL</div>
+        </td>
+    	</tr>
+      <tr>
+        <td id='links' align='center' style="width: 100%;" valign='middle'>
+          <div onclick='redirect("yt")'>YouTube</div>
+        </td>
+    	</tr>
+      <tr>
+        <td id='links' align='center' style="width: 100%;" valign='middle'>
+          <div onclick='redirect("twitch")'>Twitch</div>
+        </td>
+    	</tr>
+      <tr>
+        <td id='links' align='center' style="width: 100%;" valign='middle'>
+          <div onclick='redirect("ocr")'>OCRemix Radio</div>
+        </td>
+    	</tr>
+      <tr>
+        <td id='links' align='center' style="width: 100%;" valign='middle'>
+          <div onclick='redirect("spotify")'>Spotify</div>
+        </td>
+    	</tr>
+    </table>
+    <div style='position: absolute; bottom: 22px;' id='popout'>
+      <table width="220px" style='padding-left: 5px;'>
+      	<tr style="width: 98%;">
+          <td id='links' align='center' style="width: 100%;" valign='middle'>
+            <div onclick='popOut()'>Pop Out This Screen</div>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </body>
+  <script src='scripts/background.js'></script>
+</html>
