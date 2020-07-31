@@ -1,7 +1,8 @@
 //Requirements for application
-const { app, BrowserWindow, Menu, Tray, Notification, globalShortcut, shell, dialog } = require('electron');
+const { app, BrowserView, BrowserWindow, Menu, Tray, Notification, globalShortcut, shell, dialog } = require('electron');
 const https = require('https');
 const path = require('path');
+const fs = require('fs');
 const Store = require('./store.js');
 const axios = require('axios');
 
@@ -52,16 +53,35 @@ const store = new Store(
     configName: 'user-preferences',
     defaults:{
       windowBounds: { width: 1280, height: 720 }, //mainWindow default
-      musicBounds: { width: 620, height: 400 }, //musicWindow default (Possibly change to bigger?)
-      emailBounds: { width: 800, height: 450 }, //emailWindow default
+      win2Bounds: { width: 800, height: 450 }, //secondWindow default
       tooltip: 'yes',
       tooltipLaunch: 'yes', //Default to show Notifications
       isMaximized: 'no', //Default to basic window size (Windows Only)
-      mIsMaximized: 'no', //Default to basic mediaWindow size (Windows Only)
-      eIsMaximized: 'no' //Default to basic emailWindow size (Windows Only)
     }
   }
 );
+const bckgrnd = new Store(
+  {
+    configName: 'background',
+    defaults:{
+      url: 'none',
+    }
+  }
+);
+
+//Remove Old Value on Launch
+if (store.get('mIsMaximized')){
+  store.del('mIsMaximized');
+}
+if (store.get('musicBounds')){
+  store.del('musicBounds');
+}
+if (store.get('eIsMaximized')){
+  store.del('eIsMaximized');
+}
+if (store.get('emailBounds')){
+  store.del('emailBounds');
+}
 
 //Get Stored Remember for Tooltip
 if (!store.get('tooltip')){
@@ -73,11 +93,11 @@ if (!store.get('tooltipLaunch')){
 if (!store.get('isMaximized')){
   store.set('isMaximized', 'no')
 }
-if (!store.get('mIsMaximized')){
-  store.set('mIsMaximized', 'no')
+if (!store.get('isMaximized2')){
+  store.set('isMaximized2', 'no')
 }
-if (!store.get('eIsMaximized')){
-  store.set('eIsMaximized', 'no')
+if (!store.get('win2Bounds')){
+  store.set('win2Bounds', {width: 800, height: 450});
 }
 let tooltip = store.get('tooltip');
 let onLaunch = store.get('tooltipLaunch')
@@ -95,78 +115,29 @@ var tooltipOptions = {
 /*Template of options*/
 let menuT = [
   {
-    label: 'Media',
+    label: 'App',
     submenu: [
       {
-        label: 'Video',
-        submenu: [
-          {
-            label: 'YouTube',
-            id: 'yt',
-            click(){
-              disableMusic();
-              musicWin('youtube');
-            }
-          },{
-            label: 'Twitch',
-            id: 'twitch',
-            click(){
-              disableMusic();
-              musicWin('twitch');
-            }
-          }
-        ]
-      },{
-        label: 'Music',
-        submenu: [
-          {
-            label: 'Spotify',
-            id: 'spotify',
-            click(){
-              disableMusic();
-              musicWin('spotify');
-            }
-          },{
-            label: 'OCRemix Radio',
-            id: 'ocr',
-            click(){
-              disableMusic();
-              musicWin('ocr');
-            }
-          }
-        ]
-      }
-    ]
-  },{
-    label: 'Email',
-    submenu: [
-      {
-        label: 'G-Mail',
-        id: 'gmail',
+        label: 'Notifications',
         click(){
-          disableEmail('gmail');
-          emailWin('gmail');
+          dialog.showMessageBox(tooltipOptions).then(result => {
+            if (result.checkboxChecked === true){
+              store.set('tooltipLaunch', 'no')
+            } else {
+              store.set('tooltipLaunch', 'yes')
+            }
+            if (result.response === 0){
+              store.set('tooltip', 'yes')
+            }
+            if (result.response === 1){
+              store.set('tooltip', 'no');
+            }
+          })
         }
       },{
-        label: 'Yahoo',
-        id: 'yahoo',
+        label: 'Change Background',
         click(){
-          disableEmail('yahoo');
-          emailWin('yahoo');
-        }
-      },{
-        label: 'Outlook',
-        id: 'outlook',
-        click(){
-          disableEmail('outlook');
-          emailWin('outlook');
-        }
-      },{
-        label: 'AOL',
-        id: 'aol',
-        click(){
-          disableEmail('aol');
-          emailWin('aol');
+          uploadBackground()
         }
       }
     ]
@@ -259,23 +230,6 @@ let menuT = [
       }
     ]
   },{
-    label: 'Notifications',
-    click(){
-      dialog.showMessageBox(tooltipOptions).then(result => {
-        if (result.checkboxChecked === true){
-          store.set('tooltipLaunch', 'no')
-        } else {
-          store.set('tooltipLaunch', 'yes')
-        }
-        if (result.response === 0){
-          store.set('tooltip', 'yes')
-        }
-        if (result.response === 1){
-          store.set('tooltip', 'no');
-        }
-      })
-    }
-  },{
     label: 'About',
     role: 'about',
     submenu: [
@@ -322,28 +276,6 @@ function changeLog(){
 var updateItem = menu.getMenuItemById('dl-update'); //Download Updates Button
 var upd8CheckBtn = menu.getMenuItemById('update-check'); //Check for Updates Button
 
-//Music Function for enable/disable options
-var musicSources = ['yt','spotify','ocr','twitch'];
-function disableMusic(){
-  for (var i = 0; i < musicSources.length; i++){
-    menu.getMenuItemById(musicSources[i]).enabled = false;
-  }
-}
-function enableMusic(){
-  for (var i = 0; i < musicSources.length; i++){
-    menu.getMenuItemById(musicSources[i]).enabled = true;
-  }
-}
-
-//Music Function for enable/disable options
-var emailSources = ['gmail','yahoo','outlook','aol'];
-function disableEmail(source){
-  menu.getMenuItemById(source).enabled = false;
-}
-function enableEmail(source){
-  menu.getMenuItemById(source).enabled = true;
-}
-
 //mainWindow function to be called by app.on('ready')
 function createWindow () {
   //Call Notification Dialog before window loads
@@ -387,10 +319,18 @@ function createWindow () {
   }
 
   //Page to load (Leaving other file commented out until finished)
-  mainWindow.loadURL('https://tweetdeck.twitter.com')
-  //mainWindow.loadFile('src/index.html')
+  //mainWindow.loadURL('https://tweetdeck.twitter.com')
+
+  /*View Testing*/
+  const view = new BrowserView()
+  mainWindow.setBrowserView(view)
+  view.setBounds({ x: 235, y: 20, width: (width - 265), height: (height - 100) })
+  view.setAutoResize({ width: true, height: true })
+  view.webContents.loadURL('https://tweetdeck.twitter.com')
+  mainWindow.loadFile('src/index.html')
 
   // Open the DevTools (Uncomment to open on launch. Press Ctrl+Alt+I to open in app with or without this line)
+  //NOTE: DevTools will not show with BrowserView
   //mainWindow.webContents.openDevTools()
 
   //Add Menu (Leaving other code incase both windows need different menus)
@@ -438,7 +378,7 @@ function createWindow () {
   })
 
   // Emitted when the window is minimized.
-  mainWindow.on('minimize', function(event){
+  /*mainWindow.on('minimize', function(event){
     event.preventDefault();
     show = false;
     mainWindow.hide(); //Pass all other variables to .on('hide')
@@ -460,7 +400,7 @@ function createWindow () {
         })
       }
     }
-  })
+  })*/
 
   // Emitted when the window is maximized.
   mainWindow.on('maximize', function(event){
@@ -542,7 +482,7 @@ function createWindow () {
   })
 
   //Open all links in the Default Browser
-  mainWindow.webContents.on('new-window', (event, url) => {
+  view.webContents.on('new-window', (event, url) => {
     event.preventDefault();
     shell.openExternal(url);
   })
@@ -552,31 +492,40 @@ function createWindow () {
   //Tray Menu Items
   const trayOptions = [
     {
-      label: 'TweetDeck', enabled: false, icon: __dirname + '/logo-small.png'
+      label: 'TweetDeck',
+      enabled: false,
+      icon: __dirname + '/logo-small.png'
     },{
       type: 'separator'
     },{
-      label: 'Open TweetDeck', click: function () {
+      label: 'Open TweetDeck',
+      click: function () {
         mainWindow.show();
       }
     },{
       type: 'separator'
     },{
-      label: 'Open Music Window', click: function () {
-        if (musicOn == 'true'){
-          homeWindow.show();
-        }
-      }
-    },{
-      label: 'Open Email Window', click: function () {
-        if (emailOn == 'true'){
-          emailWindowT.show();
-        }
+      label: 'Open Second Window',
+      click: function () {
+        var windows = BrowserWindow.getAllWindows();
+        windows[0].show();
       }
     },{
       type: 'separator'
     },{
-      label: 'Quit', click: function () {
+      label: 'Check For Updates',
+      click(){
+        manualCheck = 'true';
+        updateCheck();
+      }
+    },{
+      label: 'Changelog',
+      click(){
+        changeLog();
+      }
+    },{
+      label: 'Quit',
+      click: function () {
         mainWindow.destroy();
         app.quit();
       }
@@ -653,202 +602,6 @@ function createWindow () {
   setInterval(updateNotif, 28800000); //Notify every 8 hours if there's a new update
 }
 
-//musicWindow function to be called by Music menuItem
-function musicWin(location){
-  mediaShow = 'true'; //Mark window as shown
-  //Get musicBounds if available if not create defaults
-  if (!store.get('musicBounds')){
-    store.set('musicBounds', { width: 620, height: 400 })
-  }
-  let { width, height } = store.get('musicBounds');
-  let mIsMaximized = store.get('mIsMaximized');
-
-  //musicWindow options
-  const musicWindow = new BrowserWindow({
-    width: width,
-    height: height,
-    icon: __dirname + "/logo.png",
-    title: title(),
-    webPreferences: {
-      nativeWindowOpen: true,
-      nodeIntegration: true
-    }
-  })
-
-  if (process.platform == 'win32'){
-    if (mIsMaximized == 'yes'){
-      musicWindow.maximize();
-    }
-  }
-
-  //Redirect based on location provided by menuItem
-  if (location == 'youtube'){
-    musicWindow.loadURL('https://youtube.com')
-  }
-  if (location == 'twitch'){
-    musicWindow.loadURL('https://twitch.tv')
-  }
-  if (location == 'spotify'){
-    musicWindow.loadURL('https://open.spotify.com/?utm_source=web-player&utm_campaign=bookmark')
-  }
-  if (location == 'ocr'){
-    musicWindow.loadURL('https://rainwave.cc/ocremix/')
-  }
-
-  //Set Variables to notify mainWindow about the musicWindow
-  homeWindow = musicWindow;
-  musicOn = 'true';
-
-  // Emitted when the window is maximized.
-  musicWindow.on('maximize', function(event){
-    store.set('mIsMaximized', 'yes')
-  })
-
-  // Emitted when the window exits a maximized state.
-  musicWindow.on('unmaximize', function(event){
-    store.set('mIsMaximized', 'no')
-  })
-
-  //Store Information About Size
-  musicWindow.on('resize', () => {
-    //Get Bounds
-    let { width, height } = musicWindow.getBounds();
-    //Save Information
-    store.set('musicBounds', { width, height });
-  })
-
-  // Emitted when the window is minimized.
-  musicWindow.on('minimize', function(event){
-    event.preventDefault();
-    show = false;
-    mediaShow = 'false';
-    musicWindow.hide();
-  })
-
-  // Emitted when the window is hidden.
-  musicWindow.on('hide', function(event){
-    show = false;
-    mediaShow = 'false';
-  })
-
-  musicWindow.on('show', function(event){
-    mediaShow = 'true';
-    if (process.platform == 'win32'){
-      if (mIsMaximized == 'yes'){
-        musicWindow.maximize();
-      }
-    }
-  })
-
-  // Emitted when the window is closed.
-  musicWindow.on('close', function(event){
-    musicOn = 'false';
-    mediaShow = 'false';
-    enableMusic()
-  })
-}
-
-//emailWindow function to be called by Email menuItem
-function emailWin(location){
-  emailShow = 'true'; //Mark window as shown
-  //Get emailBounds if available if not create defaults
-  if (!store.get('emailBounds')){
-    store.set('emailBounds', { width: 800, height: 450 })
-  }
-  let { width, height } = store.get('emailBounds');
-  let eIsMaximized = store.get('eIsMaximized');
-
-  //musicWindow options
-  const emailWindow = new BrowserWindow({
-    width: width,
-    height: height,
-    icon: __dirname + "/logo.png",
-    title: title(),
-    webPreferences: {
-      nativeWindowOpen: true,
-      nodeIntegration: true
-    }
-  })
-
-  if (process.platform == 'win32'){
-    if (eIsMaximized == 'yes'){
-      emailWindow.maximize();
-    }
-  }
-
-  //Redirect based on location provided by menuItem
-  if (location == 'gmail'){
-    emailWindow.loadURL('https://mail.google.com')
-  }
-  if (location == 'yahoo'){
-    emailWindow.loadURL('https://mail.yahoo.com')
-  }
-  if (location == 'outlook'){
-    emailWindow.loadURL('https://outlook.live.com')
-  }
-  if (location == 'aol'){
-    emailWindow.loadURL('https://mail.aol.com')
-  }
-
-  //Set Variables to notify mainWindow about the musicWindow
-  emailWindowT = emailWindow;
-  emailOn = 'true';
-
-  // Emitted when the window is maximized.
-  emailWindow.on('maximize', function(event){
-    store.set('eIsMaximized', 'yes')
-  })
-
-  // Emitted when the window exits a maximized state.
-  emailWindow.on('unmaximize', function(event){
-    store.set('eIsMaximized', 'no')
-  })
-
-  //Store Information About Size
-  emailWindow.on('resize', () => {
-    //Get Bounds
-    let { width, height } = emailWindow.getBounds();
-    //Save Information
-    store.set('emailBounds', { width, height });
-  })
-
-  // Emitted when the window is minimized.
-  emailWindow.on('minimize', function(event){
-    event.preventDefault();
-    show = false;
-    emailShow = 'false';
-    emailWindow.hide();
-  })
-
-  // Emitted when the window is hidden.
-  emailWindow.on('hide', function(event){
-    show = false;
-    emailShow = 'false';
-  })
-
-  emailWindow.on('show', function(event){
-    emailShow = 'true';
-    if (process.platform == 'win32'){
-      if (eIsMaximized == 'yes'){
-        emailWindow.maximize();
-      }
-    }
-  })
-
-  // Emitted when the window is closed.
-  emailWindow.on('close', function(event){
-    emailOn = 'false';
-    emailShow = 'false';
-    enableEmail(location)
-  })
-
-  //Open all links in the Default Browser
-  emailWindow.webContents.on('new-window', (event, url) => {
-    event.preventDefault();
-    shell.openExternal(url);
-  })
-}
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -912,6 +665,7 @@ function updateCheck(){
           dialog.showMessageBox(options2, (index) => {
             event.sender.send('information-dialog-selection', index)
           })
+          manualCheck = 'false';
         }
         console.log("Done v" + version + " found.");
         launchCheck = 'false';
@@ -921,6 +675,7 @@ function updateCheck(){
           dialog.showMessageBox(options3, (index) => {
             event.sender.send('information-dialog-selection', index)
           })
+          manualCheck = 'false';
         }
         console.log("Done");
         launchCheck = 'false';
@@ -931,4 +686,39 @@ function updateCheck(){
     })
 
   upd8CheckBtn.enabled = true;
+}
+
+/*Background Image*/
+function uploadBackground() {
+// If the platform is 'win32' or 'Linux'
+	// Resolves to a Promise<Object>
+	dialog.showOpenDialog({
+		title: 'Select the File to be uploaded',
+		defaultPath: path.join(__dirname, '../assets/'),
+		buttonLabel: 'Upload',
+		// Restricting the user to only Text Files.
+		filters: [
+			{
+        name: 'Images',
+				extensions: ['jpg', 'png']
+			}, ],
+		// Specifying the File Selector Property
+		properties: ['openFile']
+	}).then(file => {
+		// Stating whether dialog operation was
+		// cancelled or not.
+		console.log(file.canceled);
+		if (!file.canceled) {
+		// Updating the GLOBAL filepath variable
+		// to user-selected file.
+		global.filepath = file.filePaths[0].toString();
+		global.filepath = global.filepath.replace(/\\/g,'\/');
+    global.filepath = 'file:///' + global.filepath;
+    console.log(global.filepath);
+    bckgrnd.set('url', global.filepath);
+    BrowserWindow.getFocusedWindow().reload();
+		}
+	}).catch(err => {
+		console.log(err)
+	});
 }
