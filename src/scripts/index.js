@@ -110,6 +110,14 @@ function redirect(location){
 		view.webContents.loadURL('https://open.spotify.com/?utm_source=web-player&utm_campaign=bookmark');
 		currentLoc = location;
 	}
+  if (location == 'discord'){
+    view.webContents.loadURL('https://discord.com/channels/@me');
+		currentLoc = location;
+  }
+  if (location == 'gdrive'){
+    view.webContents.loadURL('https://drive.google.com');
+    currentLoc = location;
+  }
 }
 
 function popOut(){
@@ -143,34 +151,33 @@ function popOut(){
   }
 
 	if (currentLoc == 'tweetdeck'){
-		window.alert("Temporarily Unavailable Due to Bugs")
-    secondWindow.close();
-		//secondWindow.loadURL('https://tweetdeck.twitter.com');
-	}
-	if (currentLoc == 'gmail'){
+		/*window.alert("Temporarily Unavailable Due to Bugs")
+    secondWindow.close();*/
+		secondWindow.loadURL('https://tweetdeck.twitter.com');
+	} else if (currentLoc == 'gmail'){
 		secondWindow.loadURL('https://mail.google.com');
-	}
-	if (currentLoc == 'yahoo'){
+	} else if (currentLoc == 'yahoo'){
 		secondWindow.loadURL('https://mail.yahoo.com');
-	}
-	if (currentLoc == 'outlook'){
+	} else if (currentLoc == 'outlook'){
 		secondWindow.loadURL('https://outlook.live.com');
-	}
-	if (currentLoc == 'aol'){
+	} else if (currentLoc == 'aol'){
 		secondWindow.loadURL('https://mail.aol.com');
-	}
-	if (currentLoc == 'yt'){
+	} else if (currentLoc == 'yt'){
 		secondWindow.loadURL('https://youtube.com');
-	}
-	if (currentLoc == 'twitch'){
+	} else if (currentLoc == 'twitch'){
 		secondWindow.loadURL('https://twitch.tv');
-	}
-	if (currentLoc == 'ocr'){
+	} else if (currentLoc == 'ocr'){
 		secondWindow.loadURL('https://rainwave.cc/ocremix/');
-	}
-	if (currentLoc == 'spotify'){
+	} else if (currentLoc == 'spotify'){
 		secondWindow.loadURL('https://open.spotify.com/?utm_source=web-player&utm_campaign=bookmark');
-	}
+	} else if (location == 'discord'){
+    secondWindow.loadURL('https://discord.com/channels/@me');
+  } else if (location == 'gdrive'){
+    secondWindow.loadURL('https://drive.google.com');
+  } else {
+		window.alert("Temporarily Unavailable")
+    secondWindow.close();
+  }
 
 	// Emitted when the window is maximized.
   secondWindow.on('maximize', function(event){
@@ -216,3 +223,8 @@ function popOut(){
 
   document.getElementById('popout').style.visibility = 'hidden';
 }
+
+require('electron').ipcRenderer.on('change', function(event, message){
+  location.reload();
+  console.log(message)
+})

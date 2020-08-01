@@ -8,14 +8,14 @@
     		height: 99%;
         background-color: #000;
     	}
-      #links
+      .links
       {
         background-color: #333333;
         color: #ffffff;
         height: 50px;
         border-radius: 25px;
       }
-      #links:hover
+      .links:hover
       {
         background-color: #0000ff;
         color: #999999;
@@ -50,79 +50,95 @@
         <td align='left' id='init'>
           <table width="220px" style='padding-left: 5px; padding-top: 10px;'>
           	<tr style="width: 98%;">
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("tweetdeck")'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("tweetdeck")'>
                 <div id='container'>
                   <div id='icon'><img src='images/tweetdeck.png' width='30px' height='30px'></div>
                   TweetDeck
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("gmail")'>
+            <tr id='gmail1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("gmail")'>
                 <div id='container'>
                   <div id='icon' style='top:-3px;'><img src='images/gmail.png' width='30px' height='22px'></div>
                   Gmail
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("yahoo")'>
+            <tr id='yahoo1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("yahoo")'>
                 <div id='container'>
                   <div id='icon'><img src='images/yahoo.png' width='30px' height='30px'></div>
                   Yahoo
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("outlook")'>
+            <tr id='outlook1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("outlook")'>
                 <div id='container'>
                   <div id='icon' style='top:-3px;'><img src='images/outlook.png' width='30px' height='30px'></div>
                   Outlook
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("aol")'>
+            <tr id='aol1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("aol")'>
                 <div id='container'>
                   <div id='icon'><img src='images/aol.png' width='30px' height='30px'></div>
                   AOL
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("yt")'>
+            <tr id='yt1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("yt")'>
                 <div id='container'>
                   <div id='icon'><img src='images/yt.png' width='30px' height='30px'></div>
                   YouTube
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("twitch")'>
+            <tr id='twitch1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("twitch")'>
                 <div id='container'>
                   <div id='icon'><img src='images/twitch.png' width='30px' height='30px'></div>
                   Twitch
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("ocr")'>
+            <tr id='ocr1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("ocr")'>
                 <div id='container'>
                   <div id='icon' style='top:4px;'><img src='images/ocr.png' width='30px' height='26px'></div>
                   OCRemix<br>Radio
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("spotify")'>
+            <tr id='spotify1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("spotify")'>
                 <div id='container'>
                   <div id='icon'><img src='images/spotify.png' width='30px' height='30px'></div>
                   Spotify
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='collapse()'>
+            <tr id='discord1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("discord")'>
+                <div id='container'>
+                  <div id='icon'><img src='images/discord.png' width='30px' height='30px'></div>
+                  Discord
+                </div>
+              </td>
+          	</tr>
+            <tr id='gdrive1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("gdrive")'>
+                <div id='container'>
+                  <div id='icon'><img src='images/gdrive.png' width='30px' height='30px'></div>
+                  &nbsp;&nbsp;Google Drive
+                </div>
+              </td>
+          	</tr>
+            <tr id='collapse'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='collapse()'>
                 <div id='container'>
                   <div id='icon' style='top:1px;'><<</div>
                   Collapse
@@ -135,70 +151,84 @@
           <!--Hidden Table-->
           <table width="60px" style='padding-left: 5px; padding-top: 10px;'>
           	<tr style="width: 98%;">
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("tweetdeck")'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("tweetdeck")'>
                 <div id='container'>
                   <div id='icon2'><img src='images/tweetdeck.png' width='30px' height='30px'></div>
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("gmail")'>
+            <tr id='gmail2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("gmail")'>
                 <div id='container'>
                   <div id='icon2' style='top:-12px;'><img src='images/gmail.png' width='30px' height='22px'></div>
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("yahoo")'>
+            <tr id='yahoo2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("yahoo")'>
                 <div id='container'>
                   <div id='icon2'><img src='images/yahoo.png' width='30px' height='30px'></div>
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("outlook")'>
+            <tr id='outlook2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("outlook")'>
                 <div id='container'>
                   <div id='icon2' style='top:-12px;'><img src='images/outlook.png' width='30px' height='30px'></div>
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("aol")'>
+            <tr id='aol2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("aol")'>
                 <div id='container'>
                   <div id='icon2'><img src='images/aol.png' width='30px' height='30px'></div>
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("yt")'>
+            <tr id='yt2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("yt")'>
                 <div id='container'>
                   <div id='icon2'><img src='images/yt.png' width='30px' height='30px'></div>
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("twitch")'>
+            <tr id='twitch2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("twitch")'>
                 <div id='container'>
                   <div id='icon2'><img src='images/twitch.png' width='30px' height='30px'></div>
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("ocr")'>
+            <tr id='ocr2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("ocr")'>
                 <div id='container'>
                   <div id='icon2' style='top:-15px;'><img src='images/ocr.png' width='30px' height='26px'></div>
                 </div>
               </td>
           	</tr>
-            <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("spotify")'>
+            <tr id='spotify2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("spotify")'>
                 <div id='container'>
                   <div id='icon2'><img src='images/spotify.png' width='30px' height='30px'></div>
                 </div>
               </td>
           	</tr>
+            <tr id='discord2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("discord")'>
+                <div id='container'>
+                  <div id='icon2'><img src='images/discord.png' width='30px' height='30px'></div>
+                </div>
+              </td>
+          	</tr>
+            <tr id='gdrive2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("gdrive")'>
+                <div id='container'>
+                  <div id='icon2'><img src='images/gdrive.png' width='30px' height='30px'></div>
+                </div>
+              </td>
+          	</tr>
             <tr>
-              <td id='links' align='center' style="width: 100%;" valign='middle' onclick='expand()'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='expand()'>
                 <div id='container'>
                   >>
                 </div>
@@ -211,7 +241,7 @@
     <div style='position: absolute; bottom: 22px;' id='popout'>
       <table width="220px" style='padding-left: 5px;' id='poTable'>
       	<tr style="width: 98%;">
-          <td id='links' align='center' style="width: 100%;" valign='middle' onclick='popOut()'>
+          <td class='links' align='center' style="width: 100%;" valign='middle' onclick='popOut()'>
             <div id='container'>
               <div id='poIcon' style="top:4px;"><img src='images/window.png' width='30px' height='30px'></div>
               <span id='poText'>Pop Out<br>This Screen</span>

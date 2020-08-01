@@ -1,5 +1,5 @@
 //Requirements for application
-const { app, BrowserView, BrowserWindow, Menu, Tray, Notification, globalShortcut, shell, dialog } = require('electron');
+const { app, BrowserView, BrowserWindow, Menu, Tray, Notification, globalShortcut, shell, dialog, ipcMain } = require('electron');
 const https = require('https');
 const path = require('path');
 const fs = require('fs');
@@ -23,18 +23,18 @@ const changelogOptions = {
   type: 'info',
   buttons: ['Close'],
   title: 'Changelog',
-  message: 'Changes in v4.0.0-beta1',
-  detail: `- Complete rework of application. New layout & more.
-- Added ability to add a custom background. NOTE: Background image will need to be on host computer. After adding, if the image is moved/deleted the app will no longer have the image.
-- Changed Tray to allow Checking for Updates to occur there.
-- Added Changelog to Tray icon
-- Moved Notification changer to be under App menu item. Background Image selector is there as well.
+  message: 'Changes in v4.0.0-beta2',
+  detail: `- Added Discord and Google Drive to the sidebar.
+- Added option to only show one email provider and one media source. (Future updates will allow more than one up to all.)
+- Restored opening TweetDeck in it's own window.
+- Added New Logo for application. This isn't the final logo, but I felt like using TweetDeck's icon needed to be changed.
 
 If you have any suggestions for the app, please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).`
 }
 
 //Global References & Variables
 let mainWindow; //Main Window
+var homeWindow; // Main Window Tracker for Menu
 var not2; //Tracker for if notification2 should be shown
 var currentVer = versionNum(); //variable for versionNum where functions can't be called
 var manualCheck = 'false'; //Tracker for if update check was initiated by user or automatic
@@ -52,12 +52,14 @@ global.store = new Store(
       tooltipLaunch: 'yes', //Default to show Notifications
       isMaximized: 'no', //Default to basic window size (Windows Only)
       isMaximized2: 'no', //Default to second window size (Windows Only)
-      menuCollapsed: 'no' //Sidebar Collapsed
+      menuCollapsed: 'no', //Sidebar Collapsed
+      defaultMail: 'gmail', //Default Email Provider
+      defaultMedia: 'yt' //Default Media Source
     }
   }
 );
 
-//Get Stored Remember for Tooltip
+//Set up variables if non-existent
 if (!store.get('tooltip')){
   store.set('tooltip', 'yes')
 }
@@ -79,6 +81,14 @@ if (!store.get('menuCollapsed')){
 if (!store.get('bckgrndUrl')){
   store.set('bckgrndUrl','none')
 }
+if (!store.get('defaultMail')){
+  store.set('defaultMail','gmail')
+}
+if (!store.get('defaultMedia')){
+  store.set('defaultMedia','yt')
+}
+
+//Get Stored Remember for Tooltip
 let tooltip = store.get('tooltip');
 let onLaunch = store.get('tooltipLaunch')
 var tooltipOptions = {
@@ -119,6 +129,76 @@ let menuT = [
         click(){
           uploadBackground()
         }
+      },{
+        label: 'Default Email Service',
+        submenu: [
+          {
+            label: 'Gmail',
+            click(){
+              store.set('defaultMail', 'gmail')
+              homeWindow.webContents.send('change', 'gmail');
+            }
+          },{
+            label: 'Yahoo',
+            click(){
+              store.set('defaultMail', 'yahoo')
+              homeWindow.webContents.send('change', 'yahoo');
+            }
+          },{
+            label: 'Outlook',
+            click(){
+              store.set('defaultMail', 'outlook')
+              homeWindow.webContents.send('change', 'outlook');
+            }
+          },{
+            label: 'AOL',
+            click(){
+              store.set('defaultMail', 'aol')
+              homeWindow.webContents.send('change', 'aol');
+            }
+          },{
+            label: 'Show All',
+            click(){
+              store.set('defaultMail', 'all')
+              homeWindow.webContents.send('change', 'allMail');
+            }
+          }
+        ]
+      },{
+        label: 'Default Media Service',
+        submenu: [
+          {
+            label: 'YouTube',
+            click(){
+              store.set('defaultMedia', 'yt')
+              homeWindow.webContents.send('change', 'yt');
+            }
+          },{
+            label: 'Twitch',
+            click(){
+              store.set('defaultMedia', 'twitch')
+              homeWindow.webContents.send('change', 'twitch');
+            }
+          },{
+            label: 'OCRemix Radio',
+            click(){
+              store.set('defaultMedia', 'ocr')
+              homeWindow.webContents.send('change', 'ocr');
+            }
+          },{
+            label: 'Spotify',
+            click(){
+              store.set('defaultMedia', 'spotify')
+              homeWindow.webContents.send('change', 'spotify');
+            }
+          },{
+            label: 'Show All',
+            click(){
+              store.set('defaultMedia', 'all')
+              homeWindow.webContents.send('change', 'allMedia');
+            }
+          }
+        ]
       }
     ]
   },{
@@ -210,6 +290,25 @@ let menuT = [
       }
     ]
   },{
+    label: 'Updates',
+    submenu: [
+      {
+        label: 'Check For Updates',
+        id: 'update-check',
+        click(){
+          manualCheck = 'true';
+          updateCheck();
+        }
+      },{
+        label: 'Download Update',
+        id: 'dl-update',
+        visible: false,
+        click(){
+          shell.openExternal('https://github.com/rampantepsilon/tweetdeck/releases');
+        }
+      }
+    ]
+  },{
     label: 'About',
     role: 'about',
     submenu: [
@@ -226,20 +325,6 @@ let menuT = [
         label: "Changelog",
         click(){
           changeLog()
-        }
-      },{
-        label: 'Check For Updates',
-        id: 'update-check',
-        click(){
-          manualCheck = 'true';
-          updateCheck();
-        }
-      },{
-        label: 'Download Update',
-        id: 'dl-update',
-        visible: false,
-        click(){
-          shell.openExternal('https://github.com/rampantepsilon/tweetdeck/releases');
         }
       }
     ]
@@ -324,31 +409,6 @@ function createWindow () {
     //Save Information
     store.set('windowBounds', { width, height });
   })
-
-  // Emitted when the window is minimized. (COMMENT OUT)
-  /*mainWindow.on('minimize', function(event){
-    event.preventDefault();
-    show = false;
-    mainWindow.hide(); //Pass all other variables to .on('hide')
-    if (musicOn == 'true'){
-      if (mediaShow == 'true'){
-        dialog.showMessageBox(optionsHMusic).then(result => {
-          if (result.response === 0){
-            homeWindow.hide();
-          }
-        })
-      }
-    }
-    if (emailOn == 'true'){
-      if (emailShow == 'true'){
-        dialog.showMessageBox(optionsHEmail).then(result => {
-          if (result.response === 0){
-            emailWindowT.hide();
-          }
-        })
-      }
-    }
-  })*/
 
   // Emitted when the window is maximized.
   mainWindow.on('maximize', function(event){
@@ -469,7 +529,7 @@ function createWindow () {
   })
   const secondNotif = new Notification({
     title: 'TweetDeck',
-    body: 'Did you know? Press Ctrl+Alt+Shift+T or CMD+Alt+Shift+T to open/minimize TweetDeck.',
+    body: 'Did you know? Press Ctrl+Alt+R or CMD+Alt+R to open/minimize TweetDeck.',
     icon: __dirname + '/logo.png'
   })
   const promotion = new Notification({
@@ -498,13 +558,13 @@ function createWindow () {
 
   //Function to show update if there is a new update via setInterval
   function updateNotif(){
-    if (commit > currentVer){
+    if (version > currentVer){
       update.show();
     }
   }
 
   //Register Global Shortcut
-  globalShortcut.register('CommandOrControl+Alt+Shift+R', () => {
+  globalShortcut.register('CommandOrControl+Alt+R', () => {
     if (show == true){
       mainWindow.hide();
       show = false;
@@ -519,6 +579,7 @@ function createWindow () {
   setInterval(updateCheck, 3600000) //Check for updates every hour
   var promoTimer = setInterval(promo, 7200000) //Promote support the creator every 2 hours
   setInterval(updateNotif, 28800000); //Notify every 8 hours if there's a new update
+  homeWindow = mainWindow;
 }
 
 // This method will be called when Electron has finished
@@ -574,7 +635,8 @@ function updateCheck(){
   instance.get('http://rampantepsilon.site/projectResources/tweetdeckVersion.js')
     .then(response => {
       var version = response.data;
-      version = version.substr(0,5);
+      version = version.substr(6,11); //Change to (0,5) after release
+      console.log(version)
 
       //Complete Update Check
       if (version > currentVer){
