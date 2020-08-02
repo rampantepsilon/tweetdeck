@@ -63,6 +63,7 @@ function background(){
 
 	emailDefault()
 	mediaDefault()
+	onLoad()
 }
 
 function emailDefault(){

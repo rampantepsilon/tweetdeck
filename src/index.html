@@ -48,7 +48,7 @@
     <table>
       <tr>
         <td align='left' id='init'>
-          <table width="220px" style='padding-left: 5px; padding-top: 10px;'>
+          <table width="220px" style='padding-left: 5px; padding-top: 10px;' id='tableLarge'>
           	<tr style="width: 98%;">
               <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("tweetdeck")'>
                 <div id='container'>
@@ -145,11 +145,19 @@
                 </div>
               </td>
           	</tr>
+            <tr id='add1'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='add()'>
+                <div id='container'>
+                  <div id='icon' style='top:1px;'>+</div>
+                  Add Location
+                </div>
+              </td>
+          	</tr>
           </table>
         </td>
         <td id='hide'>
           <!--Hidden Table-->
-          <table width="60px" style='padding-left: 5px; padding-top: 10px;'>
+          <table width="60px" style='padding-left: 5px; padding-top: 10px;' id='tableSmall'>
           	<tr style="width: 98%;">
               <td class='links' align='center' style="width: 100%;" valign='middle' onclick='redirect("tweetdeck")'>
                 <div id='container'>
@@ -227,10 +235,17 @@
                 </div>
               </td>
           	</tr>
-            <tr>
+            <tr id='expand'>
               <td class='links' align='center' style="width: 100%;" valign='middle' onclick='expand()'>
                 <div id='container'>
                   >>
+                </div>
+              </td>
+          	</tr>
+            <tr id='add2'>
+              <td class='links' align='center' style="width: 100%;" valign='middle' onclick='add()'>
+                <div id='container'>
+                  +
                 </div>
               </td>
           	</tr>

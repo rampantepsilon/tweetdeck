@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>RampantDock - Add Bookmark</title>
+    <script src='scripts/index.js'></script>
+    <script src='scripts/background.js'></script>
+    <script>
+      function abBackground(){
+        if(storeR.get('bckgrndUrl') != 'none'){
+          document.body.style.backgroundImage = 'url("' + storeR.get('bckgrndUrl') + '")';
+          document.body.style.backgroundPosition = "center center"
+          document.body.style.backgroundSize = '100%';
+        }
+      }
+    </script>
+    <style>
+      html, body{
+        height: 100%
+      }
+    </style>
+  </head>
+
+  <body onload='abBackground();'>
+    <table style='background-color: #333333; color: #ffffff; width: 98%; height: 97%' align='center'>
+      <tr>
+        <td valign='top'>
+          <table width='100%'>
+            <tr>
+              <td valign='top' align='right'>
+                Formatted Name:<br>
+                (Use Captial Letters/Special Characters)
+              </td>
+              <td valign='middle' align='left'>
+                <input type='text' id='fNameBMark'>
+              </td>
+            </tr>
+            <tr>
+              <td valign='top' align='right'>
+                Name:<br>
+                (Without Captial Letters/Special Characters)
+              </td>
+              <td valign='middle' align='left'>
+                <input type='text' id='nameBMark'>
+              </td>
+            </tr>
+            <tr>
+              <td valign='top' align='right'>
+                URL:
+              </td>
+              <td valign='middle' align='left'>
+                <input type='text' id='urlBMark'>
+              </td>
+            </tr>
+            <tr>
+              <td valign='top' align='right'>
+                Logo:<br>
+                (Must have a URL attached)
+              </td>
+              <td valign='middle' align='left'>
+                <input type='text' id='logoBMark'>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" align='center'>
+                <button onclick='addLink("now")'>Add Bookmark Now</button>
+                <button onclick='addLink("later")'>Add Bookmark Later</button><br>
+                If you add a Bookmark now, the home window will refresh. If you choose to add later, you can always refresh by clicking View -> Refresh.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
