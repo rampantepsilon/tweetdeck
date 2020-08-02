@@ -23,11 +23,11 @@ const changelogOptions = {
   type: 'info',
   buttons: ['Close'],
   title: 'Changelog',
-  message: 'Changes in v4.0.0-beta2',
-  detail: `- Added Discord and Google Drive to the sidebar.
-- Added option to only show one email provider and one media source. (Future updates will allow more than one up to all.)
-- Restored opening TweetDeck in it's own window.
-- Added New Logo for application. This isn't the final logo, but I felt like using TweetDeck's icon needed to be changed.
+  message: 'Changes in v4.0.0-beta3',
+  detail: `- Fixes issue of app opening multiple tabs when handling links.
+- Fixes error that occurs when checking whether or not to call the update notification.
+- Adds Support for adding custom locations (Removing them will come with the next build. View the Wiki article about removing them until the next update.)
+- Changes link handling when dealing with Google Drive links. Now they open their own window for the app.
 
 If you have any suggestions for the app, please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).`
 }
@@ -37,6 +37,7 @@ let mainWindow; //Main Window
 var homeWindow; // Main Window Tracker for Menu
 var not2; //Tracker for if notification2 should be shown
 var currentVer = versionNum(); //variable for versionNum where functions can't be called
+var currentRelease; //variable for Current Release version
 var manualCheck = 'false'; //Tracker for if update check was initiated by user or automatic
 var launchCheck = 'true'; //Tracker for first check
 
@@ -54,7 +55,8 @@ global.store = new Store(
       isMaximized2: 'no', //Default to second window size (Windows Only)
       menuCollapsed: 'no', //Sidebar Collapsed
       defaultMail: 'gmail', //Default Email Provider
-      defaultMedia: 'yt' //Default Media Source
+      defaultMedia: 'yt', //Default Media Source
+      firstRun: 'yes'
     }
   }
 );
@@ -87,6 +89,14 @@ if (!store.get('defaultMail')){
 if (!store.get('defaultMedia')){
   store.set('defaultMedia','yt')
 }
+if (!store.get('firstRun')){
+  store.set('firstRun', 'yes')
+}
+
+//Function to change firstRun Variable
+ipcMain.on('firstRun', function(event, message){
+  store.set('firstRun', message);
+})
 
 //Get Stored Remember for Tooltip
 let tooltip = store.get('tooltip');
@@ -459,8 +469,21 @@ function createWindow () {
 
   //Open all links in the Default Browser
   view.webContents.on('new-window', (event, url) => {
-    event.preventDefault();
-    shell.openExternal(url);
+    if (!url.includes("https://docs.google.com")){
+      event.preventDefault();
+      shell.openExternal(url);
+    } else {
+      event.preventDefault()
+      options = {
+        modal: false,
+        parent: mainWindow,
+        width: 1280,
+        height: 720,
+        title: title(),
+      }
+      event.newGuest = new BrowserWindow(options)
+      event.newGuest.loadURL(url)
+    }
   })
 
   //Initialize Tray
@@ -637,6 +660,8 @@ function updateCheck(){
       var version = response.data;
       version = version.substr(6,11); //Change to (0,5) after release
       console.log(version)
+      currentRelease = version;
+      console.log(currentRelease);
 
       //Complete Update Check
       if (version > currentVer){
