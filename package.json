@@ -1,6 +1,6 @@
 {
   "name": "RampantDock",
-  "version": "4.0.0-beta2",
+  "version": "4.0.0-beta3",
   "description": "Multitasking at it's finest! Introducing our savior RampantDock!",
   "main": "index.js",
   "scripts": {
