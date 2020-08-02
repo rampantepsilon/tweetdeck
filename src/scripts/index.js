@@ -5,7 +5,7 @@ const BrowserWindow = electron.remote.BrowserWindow;
 const shell = electron.remote.shell;
 const remote = electron.remote;
 
-const Store = require('../src/store.js')
+const Store = require('./store.js')
 
 //Initialize Storage Method Store
 var storeR = remote.getGlobal('store');
