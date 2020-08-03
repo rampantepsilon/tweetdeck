@@ -582,7 +582,7 @@ function createWindow () {
 
   //Function to show update if there is a new update via setInterval
   function updateNotif(){
-    if (version > currentVer){
+    if (currentRelease > currentVer){
       update.show();
     }
   }
