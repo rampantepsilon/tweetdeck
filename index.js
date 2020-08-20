@@ -12,7 +12,7 @@ function title(){
   return title;
 }
 function buildNum(){
-  const build = '2020.08.02';
+  const build = '2020.08.19';
   return build;
 }
 function versionNum(){
@@ -23,12 +23,9 @@ const changelogOptions = {
   type: 'info',
   buttons: ['Close'],
   title: 'Changelog',
-  message: 'Changes in v4.0.0-beta4',
-  detail: `- HOTFIX: Fixed issue that wasn't occuring before with storage.
-- Fixes issue of app opening multiple tabs when handling links.
-- Fixes error that occurs when checking whether or not to call the update notification.
-- Adds Support for adding custom locations (Removing them will come with the next build. View the Wiki article about removing them until the next update.)
-- Changes link handling when dealing with Google Drive links. Now they open their own window for the app.
+  message: 'Changes in v4.0.0-beta5',
+  detail: `- Fixed issue where app would warn about version not being defined.
+- Fixed issue where adding a bookmark wouldn't work until you refreshed the window. (Future versions will remove the menu at the top.)
 
 If you have any suggestions for the app, please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).`
 }

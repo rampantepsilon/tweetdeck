@@ -11,6 +11,9 @@
           document.body.style.backgroundPosition = "center center"
           document.body.style.backgroundSize = '100%';
         }
+        if (performance.navigation.type != performance.navigation.TYPE_RELOAD){
+          location.reload();
+        }
       }
     </script>
     <style>
