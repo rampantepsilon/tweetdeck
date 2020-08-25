@@ -26,6 +26,7 @@ const changelogOptions = {
   message: 'Changes in v4.0.0-beta5',
   detail: `- Fixed issue where app would warn about version not being defined.
 - Fixed issue where adding a bookmark wouldn't work until you refreshed the window. (Future versions will remove the menu at the top.)
+- Fixed tray to now list notifications as RampantDock instead of TweetDeck.
 
 If you have any suggestions for the app, please reach out to me on Twitter @rampantepsilon or Discord (RampantEpsilon#7868).`
 }
@@ -489,13 +490,13 @@ function createWindow () {
   //Tray Menu Items
   const trayOptions = [
     {
-      label: 'TweetDeck',
+      label: 'RampantDock',
       enabled: false,
       icon: __dirname + '/logo-small.png'
     },{
       type: 'separator'
     },{
-      label: 'Open TweetDeck',
+      label: 'Open RampantDock',
       click: function () {
         mainWindow.show();
       }
@@ -544,23 +545,23 @@ function createWindow () {
 
   //Notifications
   const myNotification = new Notification({
-    title: 'TweetDeck',
-    body: 'TweetDeck is still running. Right-click the icon in the taskbar to close.',
+    title: 'RampantDock',
+    body: 'RampantDock is still running. Right-click the icon in the taskbar to close.',
     icon: __dirname + '/logo.png'
   })
   const secondNotif = new Notification({
-    title: 'TweetDeck',
-    body: 'Did you know? Press Ctrl+Alt+R or CMD+Alt+R to open/minimize TweetDeck.',
+    title: 'RampantDock',
+    body: 'Did you know? Press Ctrl+Alt+R or CMD+Alt+R to open/minimize RampantDock.',
     icon: __dirname + '/logo.png'
   })
   const promotion = new Notification({
-    title: 'TweetDeck',
+    title: 'RampantDock',
     body: 'Like what you see? Consider Donating to the Developer! Visit paypal.me/tomjware',
     icon: __dirname + '/logo.png'
   })
   const update = new Notification({
-    title: 'TweetDeck',
-    body: 'New Update Available! Download @ github.com/rampantepsilon/tweetdeck/releases',
+    title: 'RampantDock',
+    body: 'New Update Available! Download @ github.com/rampantepsilon/rampantdock/releases',
     icon: __dirname + '/logo.png'
   })
 
