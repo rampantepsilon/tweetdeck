@@ -36,7 +36,7 @@ var bLogoStorage = []
 var bFNameStorage = []
 
 function onLoad(){
-  if (storeR.get('firstRun') == 'yes'){
+  /*if (storeR.get('firstRun') == 'yes'){
     console.log('Yes')
     pLocations.set('name', ['rampantdock']);
     pLocations.set('url',['https://github.com/rampantepsilon/rampantdock/releases']);
@@ -74,7 +74,8 @@ function onLoad(){
     <div id='container'>
       <div id='icon2'><img src ='` + pLocations.get('logo')[i] + `' width='30px' height='30px'></div>
     </div>`;
-  }
+  }*/
+  console.log("Disabled")
 }
 
 function collapse(){
